@@ -4,7 +4,23 @@ class MovableObject {
   img;
   imageCache = {};
   currentImage = 0;
-  speed = 0.15;
+  speed = 0.015;
+ 
+  speedY = 0
+  acceleratio = 2;
+
+  applayGravity() {
+    setInterval(() => {
+      if (this.isAboveGound()) {
+        this.y -= this.speedY;
+        this.speedY -= this.acceleratio;
+      }
+    }, 1000/25)
+  }
+
+  isAboveGound() {
+    return this.y < 180;
+  }
 
   loadImage(path) {
     this.img = new Image();
@@ -12,15 +28,17 @@ class MovableObject {
   }
 
   moveRight() {
-   setInterval(() => {
-     this.x += this.speed;
-   }, 1000 / 60);
+      this.x += this.speed;
+       this.otherDirection = false;
   }
 
   moveLeft() {
-    setInterval(() => {
       this.x -= this.speed;
-    }, 1000 / 60);
+      this.otherDirection = true;
+  }
+
+  jump() {
+      this.y = this.speedY = 20;
   }
 
   loadeImages(arry) {
@@ -34,6 +52,13 @@ class MovableObject {
   animation() {
     setInterval(() => {
       this.x -= Math.random(200);
-    }, 30);
+    }, 100);
+  }
+
+  playAniemation(Images) {
+    let i = this.currentImage % this.WORKIMAGE.length;
+    let path = Images[i];
+    this.img = this.imageCache[path];
+    this.currentImage++;
   }
 }

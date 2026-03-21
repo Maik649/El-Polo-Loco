@@ -1,9 +1,9 @@
 class Character extends MovableObject {
   x = 100;
-  y = 180;
+  y = 180; // 180px
   widht = 100;
   height = 300;
-
+  otherDirection = false;
   IDELIMAGE = [
     "./assets/img/2_character_pepe/1_idle/idle/I-1.png",
     "./assets/img/2_character_pepe/1_idle/idle/I-2.png",
@@ -15,6 +15,19 @@ class Character extends MovableObject {
     "./assets/img/2_character_pepe/1_idle/idle/I-10.png",
   ];
 
+  LONGIDELIMAGE = [
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-11.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-12.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-13.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-14.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-15.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-16.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-17.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-18.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-19.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-20.png",
+  ];
+
   WORKIMAGE = [
     "./assets/img/2_character_pepe/2_walk/W-21.png",
     "./assets/img/2_character_pepe/2_walk/W-22.png",
@@ -24,28 +37,47 @@ class Character extends MovableObject {
     "./assets/img/2_character_pepe/2_walk/W-26.png",
   ];
 
+  JUMPIMAGE = [
+    "./assets/img/2_character_pepe/3_jump/J-31.png",
+    "./assets/img/2_character_pepe/3_jump/J-32.png",
+    "./assets/img/2_character_pepe/3_jump/J-33.png",
+    "./assets/img/2_character_pepe/3_jump/J-34.png",
+    "./assets/img/2_character_pepe/3_jump/J-35.png",
+    "./assets/img/2_character_pepe/3_jump/J-36.png",
+    "./assets/img/2_character_pepe/3_jump/J-37.png",
+    "./assets/img/2_character_pepe/3_jump/J-38.png",
+    "./assets/img/2_character_pepe/3_jump/J-39.png",
+  ];
+  m;
   world;
-  otherDirection = false;
-  speed = 1;
-  
+  speed = 15;
+  today;
+
   constructor() {
     super().loadImage("./assets/img/2_character_pepe/1_idle/idle/I-1.png");
+    this.applayGravity();
     this.loadeImages(this.IDELIMAGE);
     this.loadeImages(this.WORKIMAGE);
+    //this.loadeImages(this.LONGIDELIMAGE);
+    this.loadeImages(this.JUMPIMAGE);
     this.animation();
+    //this.clockUpdate();
   }
 
   animation() {
     setInterval(() => {
-      if (this.world.kayboard.RIGHT) {
-        this.x -= this.speed;
-        this.otherDirection = true;
+      if (this.world.kayboard.LEFT && this.x > 100) {
+        this.moveLeft();
       }
-      if (this.world.kayboard.LEFT) {
-        this.x += this.speed;
-        this.otherDirection = false;
+      
+      if (this.world.kayboard.RIGHT && this.x < this.world.level.level_end_x) {
+        this.moveRight();
       }
-      ((this.world.camara_x = -this.x), 0);
+
+      if (this.world.kayboard.UP && !this.isAboveGound()) {
+        this.jump();
+      }
+      this.world.camara_x = -this.x + 50;
     }, 1000 / 60);
 
     setInterval(() => {
@@ -53,15 +85,55 @@ class Character extends MovableObject {
       let path = this.IDELIMAGE[i];
       this.img = this.imageCache[path];
       this.currentImage++;
-    }, 200);
+    }, 150);
 
     setInterval(() => {
-      if (this.world.kayboard.RIGHT || this.world.kayboard.LEFT) {
-        let i = this.currentImage % this.WORKIMAGE.length;
-        let path = this.WORKIMAGE[i];
-        this.img = this.imageCache[path];
-        this.currentImage++;
+      if (this.isAboveGound()) {
+        this.playAniemation(this.JUMPIMAGE);
+      } else {
+       // this.playAniemation(this.IDELIMAGE);
       }
-    }, 50);
+
+      if (this.world.kayboard.RIGHT || this.world.kayboard.LEFT) {
+        this.playAniemation(this.WORKIMAGE);
+      } 
+    }, 150);
   }
+
+  // setInterval(() => {
+  //   if (!this.startTime) {
+  //     let i = this.currentImage % this.LONGIDELIMAGE.length;
+  //     let path = this.LONGIDELIMAGE[i];
+  //     this.img = this.imageCache[path];
+  //     this.currentImage++;
+  //   }
+  // }, 150);
+
+  // clockUpdate() {
+  //   setInterval(() => {
+  //     this.today = new Date();
+  //     this.startTime();
+  //     this.s = this.today.getSeconds();
+  //   }, 1000);
+  // }
+
+  // startTime() {
+  //   if (this.s > this.currentClock) {
+  //     //clearInterval(this.idelAnimaione);
+  //     this.playAniemation(this.LONGIDELIMAGE);
+  //     if (this.world.kayboard.RIGHT || this.world.kayboard.LEFT) {
+  //     this.playAniemation(this.LONGIDELIMAGE);
+
+  //      // clearInterval(this.logIdelAnimaione);
+  //     }
+  //   }
+  //   console.log(this.s);
+  // }
+
+  // checkTime(i) {
+  //   if (this.i < 60) {
+  //     this.i = 0 + this.i;
+  //   } // add zero in front of numbers < 10
+  //   return i;
+  // }
 }
