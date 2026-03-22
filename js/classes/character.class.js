@@ -1,8 +1,8 @@
 class Character extends MovableObject {
   x = 100;
-  y = 180; // 180px
+  y = 170;
   widht = 100;
-  height = 300;
+  height = 250;
 
   IDELIMAGE = [
     "./assets/img/2_character_pepe/1_idle/idle/I-1.png",
@@ -35,6 +35,7 @@ class Character extends MovableObject {
     "./assets/img/2_character_pepe/3_jump/J-38.png",
     "./assets/img/2_character_pepe/3_jump/J-39.png",
   ];
+
   // LONGIDELIMAGE = [
   //   "./assets/img/2_character_pepe/1_idle/long_idle/I-11.png",
   //   "./assets/img/2_character_pepe/1_idle/long_idle/I-12.png",
@@ -47,6 +48,7 @@ class Character extends MovableObject {
   //   "./assets/img/2_character_pepe/1_idle/long_idle/I-19.png",
   //   "./assets/img/2_character_pepe/1_idle/long_idle/I-20.png",
   // ];
+  
   //m;
   world;
   speed = 10;
@@ -54,11 +56,12 @@ class Character extends MovableObject {
 
   constructor() {
     super().loadImage("./assets/img/2_character_pepe/1_idle/idle/I-1.png");
-    this.applayGravity();
     this.loadeImages(this.IDELIMAGE);
     this.loadeImages(this.WORKIMAGE);
     this.loadeImages(this.JUMPIMAGE);
     this.animation();
+    this.applayGravity();
+
     //this.loadeImages(this.LONGIDELIMAGE);
     //this.clockUpdate();
   }
@@ -66,35 +69,37 @@ class Character extends MovableObject {
   animation() {
 
     setInterval(() => {
-    
-      if (this.world.kayboard.LEFT && this.x > 100) {
-        this.moveLeft();
-        this.otherDirection = true;
-      }
+    if (this.world.kayboard.LEFT && this.x > 100) {
+      this.x -= this.speed;
+      //this.moveLeft();
+      this.otherDirection = true;
+    }
 
-      if (this.world.kayboard.RIGHT && this.x < this.world.level.level_end_x) {
-        this.moveRight();
-        this.otherDirection = false;
-      }
-
+    if (this.world.kayboard.RIGHT && this.x < this.world.level.level_end_x) {
+      this.x += this.speed;
+      //this.moveRight();
+      this.otherDirection = false;
+    }
+     
       if (this.world.kayboard.UP && !this.isAboveGound()) {
         this.jump();
-      }
+      };
 
       this.world.camara_x = -this.x + 100;
     
     }, 1000 / 60);
 
     setInterval(() => {
-      this.playAnimation(this.IDELIMAGE);
+     this.playAnimation(this.IDELIMAGE);
     }, 250);
 
     setInterval(() => {
+      
       if (this.isAboveGound()) {
         this.playAnimation(this.JUMPIMAGE);
       } else {
         if (this.world.kayboard.LEFT || this.world.kayboard.RIGHT) {
-          this.playAnimation(this.WORKIMAGE);
+           this.playAnimation(this.WORKIMAGE);
         }
       }
     }, 150);

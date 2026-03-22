@@ -11,17 +11,14 @@ class Chicken extends MovableObject {
     "./assets/img/3_enemies_chicken/chicken_normal/1_walk/3_w.png",
   ];
   constructor() {
-    super().loadImage(
-      "./assets/img/3_enemies_chicken/chicken_normal/1_walk/1_w.png",
-    );
+    super().loadImage("./assets/img/3_enemies_chicken/chicken_normal/1_walk/1_w.png",);
     this.loadeImages(this.WORKIMAGE);
     this.x = 1000 + Math.random(this.x) * 500;
-    this.animation();
+   this.animation();
   }
   animation() {
     setInterval(() => {
       this.moveLeft(this.speed);
-      this.otherDirection = false;
     }, 1000 / 60);
     
     setInterval(() => {

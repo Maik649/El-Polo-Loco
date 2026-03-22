@@ -14,6 +14,13 @@ class MovableObject {
     this.img.src = path;
   }
 
+  playAnimation(Images) {
+    let i = this.currentImage % this.WORKIMAGE.length;
+    let path = Images[i];
+    this.img = this.imageCache[path];
+    this.currentImage++;
+  }
+
   moveLeft() {
     this.x -= this.speed;
   }
@@ -47,13 +54,6 @@ class MovableObject {
     });
   }
 
-  playAnimation(Images) {
-    let i = this.currentImage % this.WORKIMAGE.length;
-    let path = Images[i];
-    this.img = this.imageCache[path];
-    this.currentImage++;
-  }
-
   playAnimationIdel(Images) {
     let i = this.currentImage % this.IDELIMAGE.length;
     let path = Images[i];
@@ -61,6 +61,19 @@ class MovableObject {
     this.currentImage++;
   }
 
+  draws(ctx) {
+    ctx.drawImage(this.img, this.x, this.y, this.widht, this.height);
+  }
+
+  drawsFrame(ctx) {
+    ctx.beginPath();
+    ctx.lineWidth = "4";
+    ctx.strokeStyle = "blue";
+    ctx.rect(this.x, this.y, this.widht, this.height);
+    ctx.stroke();
+  }
+
+  
   // animation() {
   //   setInterval(() => {
   //     //  this.x -= Math.random(200);
