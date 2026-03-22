@@ -3,7 +3,7 @@ class Character extends MovableObject {
   y = 180; // 180px
   widht = 100;
   height = 300;
-  otherDirection = false;
+
   IDELIMAGE = [
     "./assets/img/2_character_pepe/1_idle/idle/I-1.png",
     "./assets/img/2_character_pepe/1_idle/idle/I-2.png",
@@ -13,19 +13,6 @@ class Character extends MovableObject {
     "./assets/img/2_character_pepe/1_idle/idle/I-8.png",
     "./assets/img/2_character_pepe/1_idle/idle/I-9.png",
     "./assets/img/2_character_pepe/1_idle/idle/I-10.png",
-  ];
-
-  LONGIDELIMAGE = [
-    "./assets/img/2_character_pepe/1_idle/long_idle/I-11.png",
-    "./assets/img/2_character_pepe/1_idle/long_idle/I-12.png",
-    "./assets/img/2_character_pepe/1_idle/long_idle/I-13.png",
-    "./assets/img/2_character_pepe/1_idle/long_idle/I-14.png",
-    "./assets/img/2_character_pepe/1_idle/long_idle/I-15.png",
-    "./assets/img/2_character_pepe/1_idle/long_idle/I-16.png",
-    "./assets/img/2_character_pepe/1_idle/long_idle/I-17.png",
-    "./assets/img/2_character_pepe/1_idle/long_idle/I-18.png",
-    "./assets/img/2_character_pepe/1_idle/long_idle/I-19.png",
-    "./assets/img/2_character_pepe/1_idle/long_idle/I-20.png",
   ];
 
   WORKIMAGE = [
@@ -48,9 +35,21 @@ class Character extends MovableObject {
     "./assets/img/2_character_pepe/3_jump/J-38.png",
     "./assets/img/2_character_pepe/3_jump/J-39.png",
   ];
-  m;
+  // LONGIDELIMAGE = [
+  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-11.png",
+  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-12.png",
+  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-13.png",
+  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-14.png",
+  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-15.png",
+  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-16.png",
+  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-17.png",
+  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-18.png",
+  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-19.png",
+  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-20.png",
+  // ];
+  //m;
   world;
-  speed = 15;
+  speed = 10;
   today;
 
   constructor() {
@@ -58,45 +57,46 @@ class Character extends MovableObject {
     this.applayGravity();
     this.loadeImages(this.IDELIMAGE);
     this.loadeImages(this.WORKIMAGE);
-    //this.loadeImages(this.LONGIDELIMAGE);
     this.loadeImages(this.JUMPIMAGE);
     this.animation();
+    //this.loadeImages(this.LONGIDELIMAGE);
     //this.clockUpdate();
   }
 
   animation() {
+
     setInterval(() => {
+    
       if (this.world.kayboard.LEFT && this.x > 100) {
         this.moveLeft();
+        this.otherDirection = true;
       }
-      
+
       if (this.world.kayboard.RIGHT && this.x < this.world.level.level_end_x) {
         this.moveRight();
+        this.otherDirection = false;
       }
 
       if (this.world.kayboard.UP && !this.isAboveGound()) {
         this.jump();
       }
-      this.world.camara_x = -this.x + 50;
+
+      this.world.camara_x = -this.x + 100;
+    
     }, 1000 / 60);
 
     setInterval(() => {
-      let i = this.currentImage % this.IDELIMAGE.length;
-      let path = this.IDELIMAGE[i];
-      this.img = this.imageCache[path];
-      this.currentImage++;
-    }, 150);
+      this.playAnimation(this.IDELIMAGE);
+    }, 250);
 
     setInterval(() => {
       if (this.isAboveGound()) {
-        this.playAniemation(this.JUMPIMAGE);
+        this.playAnimation(this.JUMPIMAGE);
       } else {
-       // this.playAniemation(this.IDELIMAGE);
+        if (this.world.kayboard.LEFT || this.world.kayboard.RIGHT) {
+          this.playAnimation(this.WORKIMAGE);
+        }
       }
-
-      if (this.world.kayboard.RIGHT || this.world.kayboard.LEFT) {
-        this.playAniemation(this.WORKIMAGE);
-      } 
     }, 150);
   }
 
