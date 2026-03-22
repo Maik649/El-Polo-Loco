@@ -11,6 +11,8 @@ class World {
     this.canvas = canvas;
     this.kayboard = kayboard;
     this.draw();
+    this.setWorld();
+    this.checkCollisons();
   }
 
   draw() {
@@ -21,7 +23,6 @@ class World {
     this.addObjekts(this.level.enemies);
     this.addToMap(this.character);
     this.ctx.translate(-this.camara_x, 0);
-    this.setWorld();
 
     let self = this;
     requestAnimationFrame(() => {
@@ -31,6 +32,17 @@ class World {
 
   setWorld() {
     this.character.world = this;
+  }
+
+  checkCollisons() {
+    setInterval(() => {
+      this.level.enemies.forEach((enemy) => {
+        if(this.character.isColliding(enemy)){
+          console.log("Collision with Character", enemy);
+          
+        }
+      });
+    },1000)
   }
 
   addObjekts(objekts) {

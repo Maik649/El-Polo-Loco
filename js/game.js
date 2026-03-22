@@ -27,10 +27,10 @@ window.addEventListener("keydown", (e) => {
 });
 
 window.addEventListener("keyup", (e) => {
-  if (e.keyCode === 39) {
+  if (e.keyCode === 37) {
     kayboard.LEFT = false;
   }
-  if (e.keyCode === 37) {
+  if (e.keyCode === 39) {
     kayboard.RIGHT = false;
   }
   if (e.keyCode === 38) {

@@ -3,6 +3,9 @@ class Character extends MovableObject {
   y = 170;
   widht = 100;
   height = 250;
+  workingAudio = new Audio(
+    "./assets/audios/freesound_community-running-1-6846.mp3",
+  );
 
   IDELIMAGE = [
     "./assets/img/2_character_pepe/1_idle/idle/I-1.png",
@@ -48,7 +51,7 @@ class Character extends MovableObject {
   //   "./assets/img/2_character_pepe/1_idle/long_idle/I-19.png",
   //   "./assets/img/2_character_pepe/1_idle/long_idle/I-20.png",
   // ];
-  
+
   //m;
   world;
   speed = 10;
@@ -67,45 +70,46 @@ class Character extends MovableObject {
   }
 
   animation() {
-
     setInterval(() => {
-    if (this.world.kayboard.LEFT && this.x > 100) {
-      this.x -= this.speed;
-      //this.moveLeft();
-      this.otherDirection = true;
-    }
+      this.workingAudio.pause();
 
-    if (this.world.kayboard.RIGHT && this.x < this.world.level.level_end_x) {
-      this.x += this.speed;
-      //this.moveRight();
-      this.otherDirection = false;
-    }
-     
+      if (this.world.kayboard.LEFT && this.x > 100) {
+        this.moveLeft();
+        this.otherDirection = true;
+        this.workingAudio.play();
+        }
+
+      if (this.world.kayboard.RIGHT && this.x < this.world.level.level_end_x) {
+        this.moveRight();
+        this.otherDirection = false;
+        this.workingAudio.play();
+      }
+
       if (this.world.kayboard.UP && !this.isAboveGound()) {
         this.jump();
-      };
+      }
 
       this.world.camara_x = -this.x + 100;
-    
     }, 1000 / 60);
 
     setInterval(() => {
-     this.playAnimation(this.IDELIMAGE);
+      this.playAnimation(this.IDELIMAGE);
     }, 250);
 
     setInterval(() => {
-      
       if (this.isAboveGound()) {
         this.playAnimation(this.JUMPIMAGE);
       } else {
         if (this.world.kayboard.LEFT || this.world.kayboard.RIGHT) {
-           this.playAnimation(this.WORKIMAGE);
+          this.playAnimation(this.WORKIMAGE);
         }
       }
     }, 150);
   }
 
-  // setInterval(() => {
+
+
+    // setInterval(() => {
   //   if (!this.startTime) {
   //     let i = this.currentImage % this.LONGIDELIMAGE.length;
   //     let path = this.LONGIDELIMAGE[i];
