@@ -8,6 +8,8 @@ class MovableObject {
   speedY = 0;
   acceleratio = 1;
   otherDirection = false;
+  energy = 100;
+  lastHit = 0;
 
   loadImage(path) {
     this.img = new Image();
@@ -15,10 +17,24 @@ class MovableObject {
   }
 
   playAnimation(Images) {
-    let i = this.currentImage % this.WORKIMAGE.length;
+    let i = this.currentImage % Images.length;
     let path = Images[i];
     this.img = this.imageCache[path];
     this.currentImage++;
+  }
+
+  isWork() {
+     if (this.world.kayboard.LEFT && this.x > 100) {
+       this.moveLeft();
+       this.otherDirection = true;
+       this.workingAudio.play();
+     }
+
+     if (this.world.kayboard.RIGHT && this.x < this.world.level.level_end_x) {
+       this.moveRight();
+       this.otherDirection = false;
+       this.workingAudio.play();
+     }
   }
 
   moveLeft() {
@@ -31,6 +47,28 @@ class MovableObject {
 
   jump() {
     this.y = this.speedY = 10;
+  }
+
+
+  hit() {
+    this.energy -= 5;
+    if (this.energy < 0) {
+      this.energy = 0 
+    } else {
+      this.lastHit = new Date().getTime();
+    }
+  }
+
+  isDead() {
+    return this.energy == 0;
+  }
+
+  isHurt() {
+    let timepassed = new Date().getTime() - this.lastHit;
+    timepassed = timepassed / 1000;
+    return timepassed < 1;
+    
+    
   }
 
   applayGravity() {
@@ -82,6 +120,8 @@ class MovableObject {
       this.x < mo.x &&
       this.y < mo.y + mo.height;
   }
+
+  
 
   // animation() {
   //   setInterval(() => {

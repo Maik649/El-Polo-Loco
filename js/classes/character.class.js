@@ -39,65 +39,86 @@ class Character extends MovableObject {
     "./assets/img/2_character_pepe/3_jump/J-39.png",
   ];
 
-  // LONGIDELIMAGE = [
-  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-11.png",
-  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-12.png",
-  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-13.png",
-  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-14.png",
-  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-15.png",
-  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-16.png",
-  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-17.png",
-  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-18.png",
-  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-19.png",
-  //   "./assets/img/2_character_pepe/1_idle/long_idle/I-20.png",
-  // ];
+  LONGIDELIMAGE = [
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-11.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-12.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-13.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-14.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-15.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-16.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-17.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-18.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-19.png",
+    "./assets/img/2_character_pepe/1_idle/long_idle/I-20.png",
+  ];
 
-  //m;
+  DEATIMAGE = [
+    "./assets/img/2_character_pepe/5_dead/D-51.png",
+    "./assets/img/2_character_pepe/5_dead/D-52.png",
+    "./assets/img/2_character_pepe/5_dead/D-53.png",
+    "./assets/img/2_character_pepe/5_dead/D-54.png",
+    "./assets/img/2_character_pepe/5_dead/D-55.png",
+    "./assets/img/2_character_pepe/5_dead/D-56.png",
+    "./assets/img/2_character_pepe/5_dead/D-57.png",
+  ];
+
+  HURTIMAGE = [
+    "./assets/img/2_character_pepe/4_hurt/H-41.png",
+    "./assets/img/2_character_pepe/4_hurt/H-42.png",
+    "./assets/img/2_character_pepe/4_hurt/H-43.png",
+  ];
+  currentClock = 0;
   world;
   speed = 10;
-  today;
 
   constructor() {
     super().loadImage("./assets/img/2_character_pepe/1_idle/idle/I-1.png");
     this.loadeImages(this.IDELIMAGE);
+    this.loadeImages(this.LONGIDELIMAGE);
     this.loadeImages(this.WORKIMAGE);
     this.loadeImages(this.JUMPIMAGE);
+    this.loadeImages(this.DEATIMAGE);
+    this.loadeImages(this.HURTIMAGE);
     this.animation();
     this.applayGravity();
-
-    //this.loadeImages(this.LONGIDELIMAGE);
-    //this.clockUpdate();
   }
 
   animation() {
     setInterval(() => {
       this.workingAudio.pause();
-
-      if (this.world.kayboard.LEFT && this.x > 100) {
-        this.moveLeft();
-        this.otherDirection = true;
-        this.workingAudio.play();
-        }
-
-      if (this.world.kayboard.RIGHT && this.x < this.world.level.level_end_x) {
-        this.moveRight();
-        this.otherDirection = false;
-        this.workingAudio.play();
-      }
+      this.isWork();
 
       if (this.world.kayboard.UP && !this.isAboveGound()) {
         this.jump();
       }
-
       this.world.camara_x = -this.x + 100;
     }, 1000 / 60);
 
     setInterval(() => {
-      this.playAnimation(this.IDELIMAGE);
+      if (this.currentClock < 30) {
+        this.playAnimation(this.IDELIMAGE);
+        this.currentClock++;
+      } else {
+        if (
+          this.world.kayboard.LEFT ||
+          this.world.kayboard.RIGHT ||
+          this.world.kayboard.UP
+        ) {
+          this.playAnimation(this.WORKIMAGE);
+          this.currentClock = 0;
+        }
+        this.playAnimation(this.LONGIDELIMAGE);
+      }
     }, 250);
 
     setInterval(() => {
-      if (this.isAboveGound()) {
+
+
+      if (this.isDead()) {
+        this.playAnimation(this.DEATIMAGE);
+      } else if (this.isHurt()) {
+        this.playAnimation(this.HURTIMAGE);
+      }else if (this.isAboveGound()) {
         this.playAnimation(this.JUMPIMAGE);
       } else {
         if (this.world.kayboard.LEFT || this.world.kayboard.RIGHT) {
@@ -106,43 +127,4 @@ class Character extends MovableObject {
       }
     }, 150);
   }
-
-
-
-    // setInterval(() => {
-  //   if (!this.startTime) {
-  //     let i = this.currentImage % this.LONGIDELIMAGE.length;
-  //     let path = this.LONGIDELIMAGE[i];
-  //     this.img = this.imageCache[path];
-  //     this.currentImage++;
-  //   }
-  // }, 150);
-
-  // clockUpdate() {
-  //   setInterval(() => {
-  //     this.today = new Date();
-  //     this.startTime();
-  //     this.s = this.today.getSeconds();
-  //   }, 1000);
-  // }
-
-  // startTime() {
-  //   if (this.s > this.currentClock) {
-  //     //clearInterval(this.idelAnimaione);
-  //     this.playAniemation(this.LONGIDELIMAGE);
-  //     if (this.world.kayboard.RIGHT || this.world.kayboard.LEFT) {
-  //     this.playAniemation(this.LONGIDELIMAGE);
-
-  //      // clearInterval(this.logIdelAnimaione);
-  //     }
-  //   }
-  //   console.log(this.s);
-  // }
-
-  // checkTime(i) {
-  //   if (this.i < 60) {
-  //     this.i = 0 + this.i;
-  //   } // add zero in front of numbers < 10
-  //   return i;
-  // }
 }

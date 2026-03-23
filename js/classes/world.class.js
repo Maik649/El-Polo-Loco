@@ -33,17 +33,19 @@ class World {
   setWorld() {
     this.character.world = this;
   }
+  
 
   checkCollisons() {
     setInterval(() => {
       this.level.enemies.forEach((enemy) => {
-        if(this.character.isColliding(enemy)){
-          console.log("Collision with Character", enemy);
-          
+        if (this.character.isColliding(enemy)) {
+          this.character.hit();
         }
       });
-    },1000)
+    }, 500);
   }
+
+
 
   addObjekts(objekts) {
     objekts.forEach((o) => {
@@ -63,7 +65,7 @@ class World {
       this.flipImageBack(mo);
     }
   }
-  
+
   flipImage(mo) {
     this.ctx.save();
     this.ctx.translate(mo.widht, 0, mo.x, 0);
