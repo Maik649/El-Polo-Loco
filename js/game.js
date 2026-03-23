@@ -7,8 +7,6 @@ function init() {
 }
 
 window.addEventListener("keydown", (e) => {
-  console.log(e.keyCode);
-
   if (e.keyCode === 37) {
     kayboard.LEFT = true;
   }
