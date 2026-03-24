@@ -5,6 +5,8 @@ class World {
   ctx;
   kayboard;
   camara_x = 0;
+  statusBarCoins = new StatusBar("coins", 20, 20);
+  statusBarHealt = new StatusBar("health", 20, 60);
 
   constructor(canvas, kayboard) {
     this.ctx = canvas.getContext("2d");
@@ -23,6 +25,8 @@ class World {
     this.addObjekts(this.level.enemies);
     this.addToMap(this.character);
     this.ctx.translate(-this.camara_x, 0);
+    this.addToMap(this.statusBarCoins);
+    this.addToMap(this.statusBarHealt);
 
     let self = this;
     requestAnimationFrame(() => {
@@ -33,19 +37,17 @@ class World {
   setWorld() {
     this.character.world = this;
   }
-  
 
   checkCollisons() {
     setInterval(() => {
       this.level.enemies.forEach((enemy) => {
         if (this.character.isColliding(enemy)) {
           this.character.hit();
+          this.statusBarHealt.setPercentage(this.character.energy);
         }
       });
     }, 500);
   }
-
-
 
   addObjekts(objekts) {
     objekts.forEach((o) => {
