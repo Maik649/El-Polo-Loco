@@ -88,31 +88,32 @@ class Character extends MovableObject {
       this.workingAudio.pause();
       this.isWork();
 
-      if (this.world.kayboard.UP && !this.isAboveGound()) {
+      if (this.world.kayboard.SPACE && !this.isAboveGound()) {
         this.jump();
       }
       this.world.camara_x = -this.x + 100;
     }, 1000 / 60);
 
     setInterval(() => {
+      const isMoving = this.world.kayboard.LEFT || this.world.kayboard.RIGHT;
+      const isAction = this.world.kayboard.SPACE || this.world.kayboard.D;
+      const isInAir = this.isAboveGound();
+      const isHurtOrDead = this.isHurt() || this.isDead();
+
+      if (isMoving || isAction || isInAir || isHurtOrDead) {
+        this.currentClock = 0;
+        return;
+      }
+
       if (this.currentClock < 30) {
         this.playAnimation(this.IDELIMAGE);
         this.currentClock++;
       } else {
-        if (
-          this.world.kayboard.LEFT ||
-          this.world.kayboard.RIGHT ||
-          this.world.kayboard.UP
-        ) {
-          this.playAnimation(this.WORKIMAGE);
-          this.currentClock = 0;
-        }
         this.playAnimation(this.LONGIDELIMAGE);
       }
     }, 250);
 
     setInterval(() => {
-
 
       if (this.isDead()) {
         this.playAnimation(this.DEATIMAGE);

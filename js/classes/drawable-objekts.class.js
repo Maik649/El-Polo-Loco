@@ -16,7 +16,7 @@ class DrawableObjekt {
   }
 
   drawsFrame(ctx) {
-    if (this instanceof Character || this instanceof Chicken || this instanceof Endboss) {
+    if (this instanceof Character || this instanceof Chicken || this instanceof Endboss || this instanceof ThrowableObjekts || this instanceof CollectebillObjekts) {
       ctx.beginPath();
       ctx.lineWidth = "1";
       ctx.strokeStyle = "blue";

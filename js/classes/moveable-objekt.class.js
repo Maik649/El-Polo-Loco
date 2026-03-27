@@ -43,7 +43,9 @@ class MovableObject extends DrawableObjekt {
   }
 
   hit() {
+    // sound einfügen
     this.energy -= 5;
+   
     if (this.energy < 0) {
       this.energy = 0;
     } else {
@@ -63,7 +65,7 @@ class MovableObject extends DrawableObjekt {
 
   applayGravity() {
     setInterval(() => {
-      if (this.isAboveGound()) {
+      if (this.isAboveGound() || this.speedY > 0) {
         this.y -= this.speedY;
         this.speedY -= this.acceleratio;
       }
@@ -71,7 +73,11 @@ class MovableObject extends DrawableObjekt {
   }
 
   isAboveGound() {
-    return this.y < 180;
+    if (this instanceof ThrowableObjekts) {
+      return true;
+    } else {
+      return this.y < 180;
+    }
   }
 
   playAnimationIdel(Images) {
@@ -89,10 +95,4 @@ class MovableObject extends DrawableObjekt {
       this.y < mo.y + mo.height
     );
   }
-
-  // animation() {
-  //   setInterval(() => {
-  //     //  this.x -= Math.random(200);
-  //   }, 100);
-  // }
 }

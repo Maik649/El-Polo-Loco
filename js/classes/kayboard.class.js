@@ -4,7 +4,7 @@ class Kayboard {
   UP = false;
   DOWN = false;
   SPACE = false;
-
-    constructor() {
-  }
+  D = false;
+  
+    
 }
