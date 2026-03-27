@@ -19,6 +19,8 @@ function init() {
 
   showStartScreen();
 
+  initMobileControls();
+
   canvas.addEventListener("click", function (event) {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
@@ -57,6 +59,51 @@ function init() {
       }
     }
   });
+}
+
+function bindControlButton(buttonId, onPress, onRelease) {
+  const button = document.getElementById(buttonId);
+  if (!button) return;
+
+  const start = (event) => {
+    event.preventDefault();
+    onPress();
+  };
+
+  const end = (event) => {
+    event.preventDefault();
+    onRelease();
+  };
+
+  button.addEventListener("touchstart", start);
+  button.addEventListener("touchend", end);
+  button.addEventListener("touchcancel", end);
+  button.addEventListener("mousedown", start);
+  button.addEventListener("mouseup", end);
+  button.addEventListener("mouseleave", end);
+}
+
+function initMobileControls() {
+  bindControlButton(
+    "btn-left",
+    () => (kayboard.LEFT = true),
+    () => (kayboard.LEFT = false),
+  );
+  bindControlButton(
+    "btn-right",
+    () => (kayboard.RIGHT = true),
+    () => (kayboard.RIGHT = false),
+  );
+  bindControlButton(
+    "btn-jump",
+    () => (kayboard.SPACE = true),
+    () => (kayboard.SPACE = false),
+  );
+  bindControlButton(
+    "btn-throw",
+    () => (kayboard.D = true),
+    () => (kayboard.D = false),
+  );
 }
 
 function startGame() {
