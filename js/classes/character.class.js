@@ -5,6 +5,7 @@ class Character extends MovableObject {
   height = 250;
   workingAudio = new Audio("./assets/audios/freesound_community-running-1-6846.mp3",);
   
+  
 
   IDELIMAGE = [
     "./assets/img/2_character_pepe/1_idle/idle/I-1.png",
@@ -80,6 +81,7 @@ class Character extends MovableObject {
     this.loadeImages(this.HURTIMAGE);
     this.animation();
     this.applayGravity();
+    
   }
 
   animation() {

@@ -10,10 +10,14 @@ let fullscreenIcon = { x: 0, y: 0, width: 40, height: 40 };
 let fullscreenImage = null;
 let speakerIcon = { x: 0, y: 0, width: 40, height: 40 };
 let musicMuted = false;
+let gameAudio = null;
+let gameOverAudio = null;
 
 function init() {
   canvas = document.getElementById("gameCanvas");
   ctx = canvas.getContext("2d");
+  initGameAudio();
+  initGameOverAudio();
 
   // Position des Fullscreen-Icons relativ zum Canvas festlegen
   fullscreenIcon.x = canvas.width - fullscreenIcon.width - 20;
@@ -27,53 +31,62 @@ function init() {
 
   initMobileControls();
 
-  canvas.addEventListener("click", function (event) {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const clickX = (event.clientX - rect.left) * scaleX;
-    const clickY = (event.clientY - rect.top) * scaleY;
+  canvas.addEventListener("click", handleCanvasClick);
+}
 
-    if (
-      clickX >= speakerIcon.x &&
-      clickX <= speakerIcon.x + speakerIcon.width &&
-      clickY >= speakerIcon.y &&
-      clickY <= speakerIcon.y + speakerIcon.height
-    ) {
-      toggleMusic();
-      return;
-    }
-    // Zuerst prüfen, ob auf das Fullscreen-Icon geklickt wurde
-    if (
-      clickX >= fullscreenIcon.x &&
-      clickX <= fullscreenIcon.x + fullscreenIcon.width &&
-      clickY >= fullscreenIcon.y &&
-      clickY <= fullscreenIcon.y + fullscreenIcon.height
-    ) {
-      toggleFullscreen();
-      return;
-    }
+function handleCanvasClick(event) {
+  const clickPosition = getCanvasClickPosition(event);
 
-    if (!gameStarted && !gameOver) {
-      if (
-        clickX >= startButton.x &&
-        clickX <= startButton.x + startButton.width &&
-        clickY >= startButton.y &&
-        clickY <= startButton.y + startButton.height
-      ) {
-        startGame();
-      }
-    } else if (gameOver) {
-      if (
-        clickX >= restartButton.x &&
-        clickX <= restartButton.x + restartButton.width &&
-        clickY >= restartButton.y &&
-        clickY <= restartButton.y + restartButton.height
-      ) {
-        restartGame();
-      }
-    }
-  });
+  if (handleTopIconClick(clickPosition)) {
+    return;
+  }
+
+  handleScreenButtonClick(clickPosition);
+}
+
+function getCanvasClickPosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+
+  return {
+    x: (event.clientX - rect.left) * scaleX,
+    y: (event.clientY - rect.top) * scaleY,
+  };
+}
+
+function isInsideRect(position, rect) {
+  return (
+    position.x >= rect.x &&
+    position.x <= rect.x + rect.width &&
+    position.y >= rect.y &&
+    position.y <= rect.y + rect.height
+  );
+}
+
+function handleTopIconClick(clickPosition) {
+  if (isInsideRect(clickPosition, speakerIcon)) {
+    toggleMusic();
+    return true;
+  }
+
+  if (isInsideRect(clickPosition, fullscreenIcon)) {
+    toggleFullscreen();
+    return true;
+  }
+
+  return false;
+}
+
+function handleScreenButtonClick(clickPosition) {
+  if (!gameStarted && !gameOver && isInsideRect(clickPosition, startButton)) {
+    startGame();
+    return;
+  }
+
+  if (gameOver && isInsideRect(clickPosition, restartButton)) {
+    restartGame();
+  }
 }
 
 function bindControlButton(buttonId, onPress, onRelease) {
@@ -99,48 +112,85 @@ function bindControlButton(buttonId, onPress, onRelease) {
 }
 
 function initMobileControls() {
-  bindControlButton(
-    "btn-left",
-    () => (kayboard.LEFT = true),
-    () => (kayboard.LEFT = false),
-  );
-  bindControlButton(
-    "btn-right",
-    () => (kayboard.RIGHT = true),
-    () => (kayboard.RIGHT = false),
-  );
-  bindControlButton(
-    "btn-jump",
-    () => (kayboard.SPACE = true),
-    () => (kayboard.SPACE = false),
-  );
-  bindControlButton(
-    "btn-throw",
-    () => (kayboard.D = true),
-    () => (kayboard.D = false),
-  );
+  bindControlButton("btn-left",() => (kayboard.LEFT = true),() => (kayboard.LEFT = false),);
+  bindControlButton("btn-right",() => (kayboard.RIGHT = true),() => (kayboard.RIGHT = false),);
+  bindControlButton("btn-jump",() => (kayboard.SPACE = true),() => (kayboard.SPACE = false),);
+  bindControlButton("btn-throw",() => (kayboard.D = true),() => (kayboard.D = false),);
+}
+
+function initGameAudio() {
+  if (gameAudio) {
+    return;
+  }
 
   gameAudio = new Audio("./assets/audios/mixkit-game-level-music-689.wav");
   gameAudio.loop = true;
+  gameAudio.volume = 0.25;
+  gameAudio.preload = "auto";
+}
+
+function initGameOverAudio() {
+  if (gameOverAudio) {
+    return;
+  }
+
+  gameOverAudio = new Audio("./assets/audios/universfield-game-over-deep-male-voice-clip-352695.mp3");
+  gameOverAudio.volume = 0.25;
+  gameOverAudio.preload = "auto";
+}
+
+function tryPlayGameAudio() {
+  if (!gameAudio || musicMuted) {
+    return;
+  }
+
+  const playPromise = gameAudio.play();
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch((error) => {
+      console.warn("Audio playback blocked or failed:", error);
+    });
+  }
+}
+
+function tryPlayGameOverAudio() {
+  if (!gameOverAudio || musicMuted) {
+    return;
+  }
+
+  gameOverAudio.currentTime = 0;
+  const playPromise = gameOverAudio.play();
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch((error) => {
+      console.warn("Game-over audio playback blocked or failed:", error);
+    });
+  }
+}
+
+function stopAudio(audio) {
+  if (!audio) {
+    return;
+  }
+
+  audio.pause();
+  audio.currentTime = 0;
 }
 
 function startGame() {
   gameStarted = true;
   gameOver = false;
   world = new World(canvas, kayboard);
-  if (!musicMuted) {
-    gameAudio.play();
-  }
+  stopAudio(gameOverAudio);
+  tryPlayGameAudio();
 }
 
 function restartGame() {
   gameStarted = false;
   gameOver = false;
   world = null;
+  stopAudio(gameOverAudio);
   showStartScreen();
 }
 
-gameAudio = new Audio("./assets/audios/mixkit-game-level-music-689.wav");
 function showStartScreen() {
   const startImage = new Image();
   startImage.src = "./assets/img/9_intro_outro_screens/start/startscreen_1.png";
@@ -149,7 +199,8 @@ function showStartScreen() {
     ctx.drawImage(startImage, 0, 0, canvas.width, canvas.height);
     drawStartButton();
     drawFullscreenIcon();
-     drawSpeakerIcon();
+    drawSpeakerIcon();
+    tryPlayGameAudio();
   };
 }
 
@@ -167,61 +218,111 @@ function drawStartButton() {
   ctx.font = "24px Arial";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(
-    "START",
-    startButton.x + startButton.width / 2,
-    startButton.y + startButton.height / 2,
-  );
+  ctx.fillText("START",startButton.x + startButton.width / 2,startButton.y + startButton.height / 2,);
 }
 
 function drawRestartButton() {
   ctx.fillStyle = "rgba(196, 196, 196, 0.6)";
-  drawRoundedRect(
-    restartButton.x,
-    restartButton.y,
-    restartButton.width,
-    restartButton.height,
-    8,
-  );
+  drawRoundedRect(restartButton.x,restartButton.y,restartButton.width,restartButton.height,8,);
 
   ctx.fillStyle = "#ffffff";
   ctx.font = "24px Arial";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(
-    "NOCHMAL",
-    restartButton.x + restartButton.width / 2,
-    restartButton.y + restartButton.height / 2,
-  );
+  ctx.fillText("NOCHMAL",restartButton.x + restartButton.width / 2,restartButton.y + restartButton.height / 2,);
 }
 
 function drawSpeakerIcon() {
   const { x, y, width, height } = speakerIcon;
+  const centerY = y + height / 2;
+
   ctx.save();
-  ctx.fillStyle = "rgba(255,255,255,0.85)";
+  ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
   drawRoundedRect(x, y, width, height, 6);
-  ctx.font = `${Math.floor(height * 0.65)}px Arial`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillStyle = "#333333";
-  ctx.fillText(musicMuted ? "🔇" : "🔊", x + width / 2, y + height / 2);
+  drawSpeakerBody(x, centerY);
+  drawSpeakerState(x, y, width, height, centerY);
   ctx.restore();
+}
+
+function drawSpeakerBody(x, centerY) {
+  const speakerLeft = x + 8;
+  const speakerBodyW = 7;
+  const speakerBodyH = 12;
+  // Speaker body
+  ctx.fillStyle = "#7c7b7b";
+  ctx.fillRect(speakerLeft, centerY - speakerBodyH / 2,speakerBodyW,speakerBodyH,);
+
+  // Speaker cone
+  ctx.beginPath();
+  ctx.moveTo(speakerLeft + speakerBodyW, centerY - 6);
+  ctx.lineTo(speakerLeft + speakerBodyW + 8, centerY - 10);
+  ctx.lineTo(speakerLeft + speakerBodyW + 8, centerY + 10);
+  ctx.lineTo(speakerLeft + speakerBodyW, centerY + 6);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawSpeakerState(x, y, width, height, centerY) {
+  if (musicMuted) {
+    drawMutedSlash(x, y, width, height);
+    return;
+  }
+
+  drawSoundWaves(x, width, centerY);
+}
+
+function drawMutedSlash(x, y, width, height) {
+  ctx.strokeStyle = "#d21f2b";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(x + 9, y + height - 9);
+  ctx.lineTo(x + width - 9, y + 9);
+  ctx.stroke();
+}
+
+function drawSoundWaves(x, width, centerY) {
+  ctx.strokeStyle = "#2222228c";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(x + width - 12, centerY, 4, -0.7, 0.7);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(x + width - 10, centerY, 7, -0.7, 0.7);
+  ctx.stroke();
+}
+
+function refreshSpeakerIcon() {
+  if (!ctx) {
+    return;
+  }
+
+  drawSpeakerIcon();
 }
 
 function toggleMusic() {
   musicMuted = !musicMuted;
   if (musicMuted) {
-    gameAudio.pause();
-  } else if (gameStarted) {
-    gameAudio.play();
+    if (gameAudio) {
+      gameAudio.pause();
+    }
+    if (gameOverAudio) {
+      gameOverAudio.pause();
+    }
+  } else {
+    if (gameOver) {
+      tryPlayGameOverAudio();
+    } else {
+      tryPlayGameAudio();
+    }
   }
+  refreshSpeakerIcon();
 }
 
 
 function drawFullscreenIconBackground() {
   const { x, y, width, height, backround } = fullscreenIcon;
   const radius = 6;
-  ctx.fillStyle = backround || "#ffffff";
+  ctx.fillStyle = backround || "#ffffffb2";
   ctx.beginPath();
   ctx.moveTo(x + radius, y);
   ctx.lineTo(x + width - radius, y);
@@ -237,29 +338,29 @@ function drawFullscreenIconBackground() {
 }
 
 function drawFullscreenIcon() {
-  if (!fullscreenImage) {
-    fullscreenImage = new Image();
-    fullscreenImage.src =
-      "./assets/img/9_intro_outro_screens/start/full-screen-icon-11806.png";
-    fullscreenImage.onload = () => {
-      drawFullscreenIconBackground();
-      ctx.drawImage(
-        fullscreenImage,
-        fullscreenIcon.x,
-        fullscreenIcon.y,
-        fullscreenIcon.width,
-        fullscreenIcon.height,
-      );
-    };
-  } else {
-    ctx.drawImage(
-      fullscreenImage,
-      fullscreenIcon.x,
-      fullscreenIcon.y,
-      fullscreenIcon.width,
-      fullscreenIcon.height,
-    );
+  if (fullscreenImage) {
+    renderFullscreenIconImage();
+    return;
   }
+
+  loadFullscreenIconImage();
+}
+
+function loadFullscreenIconImage() {
+  fullscreenImage = new Image();
+  fullscreenImage.src ="./assets/img/9_intro_outro_screens/start/full-screen-icon-11806.png";
+  fullscreenImage.onload = renderFullscreenIconImage;
+}
+
+function renderFullscreenIconImage() {
+  drawFullscreenIconBackground();
+  ctx.drawImage(
+    fullscreenImage,
+    fullscreenIcon.x,
+    fullscreenIcon.y,
+    fullscreenIcon.width,
+    fullscreenIcon.height,
+  );
 }
 
 function checkOrientation() {
@@ -323,6 +424,7 @@ function showWinScreen() {
   gameStarted = false;
   gameOver = true;
   gameAudio.pause();
+  stopAudio(gameOverAudio);
   const image = new Image();
   image.src = "./assets/img/You won, you lost/You Win A.png";
   image.onload = function () {
@@ -336,6 +438,8 @@ function showWinScreen() {
 function showGameOverScreen() {
   gameStarted = false;
   gameOver = true;
+  gameAudio.pause();
+  tryPlayGameOverAudio();
 
   const image = new Image();
   image.src = "./assets/img/9_intro_outro_screens/game_over/game over.png";
@@ -343,12 +447,14 @@ function showGameOverScreen() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
     drawRestartButton();
+    drawSpeakerIcon();
   };
 }
 
 function showNoBottlesScreen() {
   gameStarted = false;
   gameOver = true;
+  stopAudio(gameOverAudio);
 
   const image = new Image();
   image.src = "./assets/img/You won, you lost/You lost.png";

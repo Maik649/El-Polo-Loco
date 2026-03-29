@@ -110,9 +110,7 @@ class World {
           this.character.hit();
           this.statusBarHealt.setPercentage(this.character.energy);
           setTimeout(() => {
-            if (
-              this.character.isDead() &&
-              !this.gameOver &&
+            if (this.character.isDead() && !this.gameOver &&
               typeof showGameOverScreen === "function"
             ) {
               this.gameOver = true;
