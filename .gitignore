@@ -1,0 +1,10 @@
+# Kommentar: Ignoriere den gesamten node_modules Ordner
+node_modules/
+
+# Ignoriere alle Umgebungsvariablen-Dateien
+.env
+
+# Ignoriere Log-Dateien
+*.log
+
+*.txt
