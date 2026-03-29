@@ -20,6 +20,8 @@ class World {
     new CollectebillObjekts(1500, 360),
   ];
   bottlesCollected = 0;
+  
+
 
   constructor(canvas, kayboard) {
     this.ctx = canvas.getContext("2d");
@@ -98,9 +100,7 @@ class World {
       if (this.character.isColliding(enemy)) {
         const characterBottom = this.character.y + this.character.height;
         const enemyTop = enemy.y;
-        const stompFromTop =
-          this.character.speedY < 0 &&
-          characterBottom <= enemyTop + enemy.height / 2;
+        const stompFromTop = this.character.speedY < 0 && characterBottom <= enemyTop + enemy.height / 2;
 
         if (enemy instanceof Chicken && enemy.dead) {
           return;
@@ -109,14 +109,16 @@ class World {
         } else if (!this.character.isHurt()) {
           this.character.hit();
           this.statusBarHealt.setPercentage(this.character.energy);
-          if (
-            this.character.isDead() &&
-            !this.gameOver &&
-            typeof showGameOverScreen === "function"
-          ) {
-            this.gameOver = true;
-            showGameOverScreen();
-          }
+          setTimeout(() => {
+            if (
+              this.character.isDead() &&
+              !this.gameOver &&
+              typeof showGameOverScreen === "function"
+            ) {
+              this.gameOver = true;
+              showGameOverScreen();
+            }
+          }, 2000);
         }
       }
     });
@@ -141,8 +143,13 @@ class World {
             !this.gameOver &&
             typeof showWinScreen === "function"
           ) {
-            this.gameOver = true;
-            showWinScreen();
+            setTimeout(() => {
+              if (this.gameOver) {
+                return;
+              }
+              this.gameOver = true;
+              showWinScreen();
+            }, 2500);
           }
         }
       });
@@ -162,21 +169,6 @@ class World {
   }
 
   checkNoBottlesLose() {
-    if (this.gameOver) {
-      return;
-    }
-
-    let endbossAlive = false;
-    this.level.enemies.forEach((enemy) => {
-      if (enemy instanceof Endboss && !enemy.isDead()) {
-        endbossAlive = true;
-      }
-    });
-
-    if (!endbossAlive) {
-      return;
-    }
-
     if (
       this.bottlesCollected === 0 &&
       this.bottle.length === 0 &&
