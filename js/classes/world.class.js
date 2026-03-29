@@ -42,14 +42,7 @@ class World {
     if (this.gameOver) {
       return;
     }
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.translate(this.camara_x, 0);
-    this.addObjekts(this.level.backrounds);
-    this.addObjekts(this.level.enemies);
-    this.addObjekts(this.level.clouds);
-    this.addObjekts(this.throwableobjekts);
-    this.addObjekts(this.bottle);
-    this.addToMap(this.character);
+    this.setDraw();
     this.ctx.translate(-this.camara_x, 0);
     this.addToMap(this.statusBarCoins);
     this.addToMap(this.statusBarHealt);
@@ -63,6 +56,17 @@ class World {
     });
   }
 
+  setDraw() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.translate(this.camara_x, 0);
+    this.addObjekts(this.level.backrounds);
+    this.addObjekts(this.level.enemies);
+    this.addObjekts(this.level.clouds);
+    this.addObjekts(this.throwableobjekts);
+    this.addObjekts(this.bottle);
+    this.addToMap(this.character);
+  }
+
   setWorld() {
     this.character.world = this;
   }
@@ -70,8 +74,26 @@ class World {
   run() {
     this.checkCollisons();
     this.checkThowableObjeks();
+    this.updateThrowableObjekts();
     this.checkEndbossMovement();
     this.checkNoBottlesLose();
+  }
+
+  updateThrowableObjekts() {
+    for (let i = this.throwableobjekts.length - 1; i >= 0; i--) {
+      const bottle = this.throwableobjekts[i];
+
+      if (!bottle.broken && bottle.hasHitGround()) {
+        bottle.breakBottle();
+      }
+
+      if (bottle.markedForRemoval) {
+        if (typeof bottle.dispose === "function") {
+          bottle.dispose();
+        }
+        this.throwableobjekts.splice(i, 1);
+      }
+    }
   }
 
   checkThowableObjeks() {
@@ -81,8 +103,7 @@ class World {
       const startY = this.character.y + 50;
 
       const bottle = new ThrowableObjekts(
-        startX,
-        startY,
+        startX, startY,
         this.character.otherDirection,
       );
 
@@ -95,35 +116,7 @@ class World {
   }
 
   checkCollisons() {
-    this.level.enemies.forEach((enemy) => {
-      if (this.character.isColliding(enemy)) {
-        const characterBottom = this.character.y + this.character.height;
-        const enemyTop = enemy.y;
-        const stompFromTop =
-          this.character.speedY < 0 &&
-          characterBottom <= enemyTop + enemy.height / 2;
-        const isChickenEnemy = enemy instanceof Chicken || enemy instanceof ChickenSmall;
-
-        if (isChickenEnemy && enemy.dead) {
-          return;
-        } else if (isChickenEnemy && stompFromTop && !enemy.dead) {
-          enemy.die();
-        } else if (!this.character.isHurt()) {
-          this.character.hit();
-          this.statusBarHealt.setPercentage(this.character.energy);
-          setTimeout(() => {
-            if (
-              this.character.isDead() &&
-              !this.gameOver &&
-              typeof showGameOverScreen === "function"
-            ) {
-              this.gameOver = true;
-              showGameOverScreen();
-            }
-          }, 2000);
-        }
-      }
-    });
+    this.handleEnemyCollisions();
 
     this.bottle.forEach((bottle, index) => {
       if (this.character.isColliding(bottle)) {
@@ -134,28 +127,109 @@ class World {
       }
     });
 
+    this.handleBottleHitsOnEndboss();
+  }
+
+  handleEnemyCollisions() {
+    this.level.enemies.forEach((enemy) => {
+      if (!this.character.isColliding(enemy)) {
+        return;
+      }
+
+      this.handleCharacterEnemyCollision(enemy);
+    });
+  }
+
+  handleCharacterEnemyCollision(enemy) {
+    const chickenEnemy = this.isChickenEnemy(enemy);
+
+    if (chickenEnemy && enemy.dead) {
+      return;
+    }
+
+    if (chickenEnemy && this.isStompFromTop(enemy)) {
+      enemy.die();
+      return;
+    }
+
+    this.handleCharacterHitByEnemy();
+  }
+
+  isChickenEnemy(enemy) {
+    return enemy instanceof Chicken || enemy instanceof ChickenSmall;
+  }
+
+  isStompFromTop(enemy) {
+    const characterBottom = this.character.y + this.character.height;
+    const enemyTop = enemy.y;
+
+    return (
+      this.character.speedY < 0 &&
+      characterBottom <= enemyTop + enemy.height / 2
+    );
+  }
+
+  handleCharacterHitByEnemy() {
+    if (this.character.isHurt()) {
+      return;
+    }
+
+    this.character.hit();
+    this.statusBarHealt.setPercentage(this.character.energy);
+
+    setTimeout(() => {
+      if (
+        this.character.isDead() &&
+        !this.gameOver &&
+        typeof showGameOverScreen === "function"
+      ) {
+        this.gameOver = true;
+        showGameOverScreen();
+      }
+    }, 2000);
+  }
+
+  handleBottleHitsOnEndboss() {
     this.throwableobjekts.forEach((bottle, index) => {
       this.level.enemies.forEach((enemy) => {
-        if (enemy instanceof Endboss && bottle.isColliding(enemy)) {
-          enemy.hit(10);
-          this.throwableobjekts.splice(index, 1);
-          this.statusBarEndboss.setPercentage(enemy.energy);
-          if (
-            enemy.isDead() &&
-            !this.gameOver &&
-            typeof showWinScreen === "function"
-          ) {
-            setTimeout(() => {
-              if (this.gameOver) {
-                return;
-              }
-              this.gameOver = true;
-              showWinScreen();
-            }, 2500);
-          }
+        if (!(enemy instanceof Endboss) || !bottle.isColliding(enemy)) {
+          return;
         }
+
+        this.handleSingleBottleHit(enemy, bottle, index);
       });
     });
+  }
+
+  handleSingleBottleHit(enemy, bottle, index) {
+    enemy.hit(10);
+
+    if (typeof bottle.dispose === "function") {
+      bottle.dispose();
+    }
+
+    this.throwableobjekts.splice(index, 1);
+    this.statusBarEndboss.setPercentage(enemy.energy);
+    this.triggerWinScreenIfNeeded(enemy);
+  }
+
+  triggerWinScreenIfNeeded(enemy) {
+    if (
+      !enemy.isDead() ||
+      this.gameOver ||
+      typeof showWinScreen !== "function"
+    ) {
+      return;
+    }
+
+    setTimeout(() => {
+      if (this.gameOver) {
+        return;
+      }
+
+      this.gameOver = true;
+      showWinScreen();
+    }, 2500);
   }
 
   checkEndbossMovement() {

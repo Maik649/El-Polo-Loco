@@ -87,11 +87,7 @@ class MovableObject extends DrawableObjekt {
   };
 
   isAboveGound() {
-    if (this instanceof ThrowableObjekts) {
-      return true;
-    } else {
-      return this.y < this.groundLevel;
-    }
+    return this.y < this.groundLevel;
   };
 
   playAnimationIdel(Images) {

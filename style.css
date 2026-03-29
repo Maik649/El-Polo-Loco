@@ -103,7 +103,6 @@ canvas {
         max-width: 420px;
         max-width: 720px;
     }
-
 }
 
 @media only screen and (max-width: 720px) {
@@ -144,6 +143,10 @@ canvas {
     height: 100vh;
 }
 
+
+.game-container:fullscreen h1 {
+    display: none;
+}
 .game-container:fullscreen canvas,
 .game-container:-webkit-full-screen canvas {
     width: 100vw;

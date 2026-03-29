@@ -1,6 +1,15 @@
 class ThrowableObjekts extends MovableObject {
+  x = 360;
+  groundLevel = 360;
+  acceleratio = 2;
+  broken = false;
+  markedForRemoval = false;
+  throwInterval = null;
+  SPLASH_IMAGE = "./assets/img/6_salsa_bottle/bottle_rotation/bottle_splash/1_bottle_splash.png";
+
   constructor(x, y, otherDirection) {
     super().loadImage("./assets/img/6_salsa_bottle/2_salsa_bottle_on_ground.png",);
+    this.loadeImages([this.SPLASH_IMAGE]);
     this.widht = 60;
     this.height = 80;
     this.trow(x, y, otherDirection);
@@ -9,13 +18,50 @@ class ThrowableObjekts extends MovableObject {
   trow(x, y, otherDirection) {
     this.x = x;
     this.y = y;
-    this.speedY = 30;
+    this.speedY = 15;
     this.otherDirection = otherDirection;
     this.applayGravity();
 
-    setInterval(() => {
-      this.y += 5;
-      this.x += this.otherDirection ? -5 : 5;
-    }, 25);
+    this.throwInterval = setInterval(() => {
+      if (this.broken) {
+        return;
+      }
+
+      this.x += this.otherDirection ? -8 : 8;
+      if (this.hasHitGround()) {
+        this.breakBottle();
+      }
+    }, 1000 / 60);
+  }
+
+  hasHitGround() {
+    return this.y >= this.groundLevel && this.speedY <= 0;
+  }
+
+  breakBottle() {
+    if (this.broken) {
+      return;
+    }
+
+    this.broken = true;
+    this.speedY = 0;
+    this.y = this.groundLevel;
+    this.img = this.imageCache[this.SPLASH_IMAGE];
+
+    if (this.throwInterval) {
+      clearInterval(this.throwInterval);
+      this.throwInterval = null;
+    }
+
+    setTimeout(() => {
+      this.markedForRemoval = true;
+    }, 180);
+  }
+
+  dispose() {
+    if (this.throwInterval) {
+      clearInterval(this.throwInterval);
+      this.throwInterval = null;
+    }
   }
 }

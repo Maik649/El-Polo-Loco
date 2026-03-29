@@ -3,9 +3,9 @@ let ctx;
 let world;
 let kayboard = new Kayboard();
 let gameStarted = false;
-let startButton = { x: 260, y: 410, width: 200, height: 60 };
+let startButton = { x: 260, y: 350, width: 200, height: 60 };
 let gameOver = false;
-let restartButton = { x: 260, y: 410, width: 200, height: 60 };
+let restartButton = { x: 260, y: 350, width: 200, height: 60 };
 let fullscreenIcon = { x: 0, y: 0, width: 40, height: 40 };
 let fullscreenImage = null;
 let speakerIcon = { x: 0, y: 0, width: 40, height: 40 };
@@ -25,11 +25,9 @@ function init() {
   initWinAudio();
   initNoBottlesAudio();
 
-  // Position des Fullscreen-Icons relativ zum Canvas festlegen
   fullscreenIcon.x = canvas.width - fullscreenIcon.width - 20;
   fullscreenIcon.y = 35;
 
-  // Speaker-Icon links neben dem Fullscreen-Icon
   speakerIcon.x = fullscreenIcon.x - speakerIcon.width - 10;
   speakerIcon.y = fullscreenIcon.y;
 
@@ -268,13 +266,7 @@ function showStartScreen() {
 
 function drawStartButton() {
   ctx.fillStyle = "rgba(122, 122, 122, 0.6)";
-  drawRoundedRect(
-    startButton.x,
-    startButton.y,
-    startButton.width,
-    startButton.height,
-    8,
-  );
+  drawRoundedRect( startButton.x, startButton.y, startButton.width, startButton.height, 8,);
 
   ctx.fillStyle = "#ffffff";
   ctx.font = "24px Arial";
@@ -364,18 +356,7 @@ function refreshSpeakerIcon() {
 function toggleMusic() {
   musicMuted = !musicMuted;
   if (musicMuted) {
-    if (gameAudio) {
-      gameAudio.pause();
-    }
-    if (gameOverAudio) {
-      gameOverAudio.pause();
-    }
-    if (winAudio) {
-      winAudio.pause();
-    }
-    if (noBottlesAudio) {
-      noBottlesAudio.pause();
-    }
+   setSounds();
   } else {
     if (gameWon) {
       tryPlayWinAudio();
@@ -388,6 +369,21 @@ function toggleMusic() {
     }
   }
   refreshSpeakerIcon();
+}
+
+ function setSounds(){
+   if (gameAudio) {
+      gameAudio.pause();
+    }
+    if (gameOverAudio) {
+      gameOverAudio.pause();
+    }
+    if (winAudio) {
+      winAudio.pause();
+    }
+    if (noBottlesAudio) {
+      noBottlesAudio.pause();
+    }
 }
 
 function drawFullscreenIconBackground() {
@@ -439,12 +435,10 @@ function checkOrientation() {
   const isLandscape = window.matchMedia("(orientation: landscape)").matches;
 
   if (isLandscape) {
-    console.log("Querformat (Landscape)");
     if (overlay) {
       overlay.style.display = "none";
     }
   } else {
-    console.log("Hochformat (Portrait)");
     if (overlay) {
       overlay.style.display = "flex";
     }
@@ -455,16 +449,10 @@ checkOrientation();
 window.addEventListener("resize", checkOrientation);
 
 function toggleFullscreen() {
-  const elem = document.getElementById("gameContainer");
+  
 
   if (!document.fullscreenElement) {
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) {
-      elem.msRequestFullscreen();
-    }
+   setToggleFullscreen();
   } else {
     if (document.exitFullscreen) {
       document.exitFullscreen();
@@ -474,6 +462,17 @@ function toggleFullscreen() {
       document.msExitFullscreen();
     }
   }
+}
+ 
+function setToggleFullscreen() {
+  const elem = document.getElementById("gameContainer");
+ if (elem.requestFullscreen) {
+   elem.requestFullscreen();
+ } else if (elem.webkitRequestFullscreen) {
+   elem.webkitRequestFullscreen();
+ } else if (elem.msRequestFullscreen) {
+   elem.msRequestFullscreen();
+ }
 }
 
 function drawRoundedRect(x, y, width, height, radius) {
