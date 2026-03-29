@@ -322,7 +322,7 @@ function toggleMusic() {
 function drawFullscreenIconBackground() {
   const { x, y, width, height, backround } = fullscreenIcon;
   const radius = 6;
-  ctx.fillStyle = backround || "#ffffffb2";
+  ctx.fillStyle = backround || "rgba(255, 255, 255, 0.6)";
   ctx.beginPath();
   ctx.moveTo(x + radius, y);
   ctx.lineTo(x + width - radius, y);
