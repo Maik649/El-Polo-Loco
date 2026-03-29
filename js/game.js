@@ -3,21 +3,27 @@ let ctx;
 let world;
 let kayboard = new Kayboard();
 let gameStarted = false;
-let startButton = { x: 260, y: 320, width: 200, height: 60 };
+let startButton = { x: 260, y: 410, width: 200, height: 60 };
 let gameOver = false;
-let restartButton = { x: 260, y: 320, width: 200, height: 60 };
+let restartButton = { x: 260, y: 410, width: 200, height: 60 };
 let fullscreenIcon = { x: 0, y: 0, width: 40, height: 40 };
 let fullscreenImage = null;
 let speakerIcon = { x: 0, y: 0, width: 40, height: 40 };
 let musicMuted = false;
 let gameAudio = null;
 let gameOverAudio = null;
+let winAudio = null;
+let gameWon = false;
+let noBottlesLost = false;
+let noBottlesAudio = null;
 
 function init() {
   canvas = document.getElementById("gameCanvas");
   ctx = canvas.getContext("2d");
   initGameAudio();
   initGameOverAudio();
+  initWinAudio();
+  initNoBottlesAudio();
 
   // Position des Fullscreen-Icons relativ zum Canvas festlegen
   fullscreenIcon.x = canvas.width - fullscreenIcon.width - 20;
@@ -139,6 +145,26 @@ function initGameOverAudio() {
   gameOverAudio.preload = "auto";
 }
 
+function initWinAudio() {
+  if (winAudio) {
+    return;
+  }
+
+  winAudio = new Audio("./assets/audios/we-ve-got-a-winner-carnival-speaker-voice-dan-barracuda-1-00-02.mp3");
+  winAudio.volume = 0.25;
+  winAudio.preload = "auto";
+}
+
+function initNoBottlesAudio() {
+  if (noBottlesAudio) {
+    return;
+  }
+
+  noBottlesAudio = new Audio("./assets/audios/fail-male-taunt-wah-wah-wah-trumpet-gfx-sounds-1-00-04.mp3");
+  noBottlesAudio.volume = 0.25;
+  noBottlesAudio.preload = "auto";
+}
+
 function tryPlayGameAudio() {
   if (!gameAudio || musicMuted) {
     return;
@@ -166,6 +192,34 @@ function tryPlayGameOverAudio() {
   }
 }
 
+function tryPlayWinAudio() {
+  if (!winAudio || musicMuted) {
+    return;
+  }
+
+  winAudio.currentTime = 0;
+  const playPromise = winAudio.play();
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch((error) => {
+      console.warn("Win audio playback blocked or failed:", error);
+    });
+  }
+}
+
+function tryPlayNoBottlesAudio() {
+  if (!noBottlesAudio || musicMuted) {
+    return;
+  }
+
+  noBottlesAudio.currentTime = 0;
+  const playPromise = noBottlesAudio.play();
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch((error) => {
+      console.warn("No-bottles audio playback blocked or failed:", error);
+    });
+  }
+}
+
 function stopAudio(audio) {
   if (!audio) {
     return;
@@ -178,16 +232,24 @@ function stopAudio(audio) {
 function startGame() {
   gameStarted = true;
   gameOver = false;
+  gameWon = false;
+  noBottlesLost = false;
   world = new World(canvas, kayboard);
   stopAudio(gameOverAudio);
+  stopAudio(winAudio);
+  stopAudio(noBottlesAudio);
   tryPlayGameAudio();
 }
 
 function restartGame() {
   gameStarted = false;
   gameOver = false;
+  gameWon = false;
+  noBottlesLost = false;
   world = null;
   stopAudio(gameOverAudio);
+  stopAudio(winAudio);
+  stopAudio(noBottlesAudio);
   showStartScreen();
 }
 
@@ -237,7 +299,7 @@ function drawSpeakerIcon() {
   const centerY = y + height / 2;
 
   ctx.save();
-  ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+  ctx.fillStyle = "#E0F2F7";
   drawRoundedRect(x, y, width, height, 6);
   drawSpeakerBody(x, centerY);
   drawSpeakerState(x, y, width, height, centerY);
@@ -308,8 +370,18 @@ function toggleMusic() {
     if (gameOverAudio) {
       gameOverAudio.pause();
     }
+    if (winAudio) {
+      winAudio.pause();
+    }
+    if (noBottlesAudio) {
+      noBottlesAudio.pause();
+    }
   } else {
-    if (gameOver) {
+    if (gameWon) {
+      tryPlayWinAudio();
+    } else if (noBottlesLost) {
+      tryPlayNoBottlesAudio();
+    } else if (gameOver) {
       tryPlayGameOverAudio();
     } else {
       tryPlayGameAudio();
@@ -318,11 +390,10 @@ function toggleMusic() {
   refreshSpeakerIcon();
 }
 
-
 function drawFullscreenIconBackground() {
   const { x, y, width, height, backround } = fullscreenIcon;
   const radius = 6;
-  ctx.fillStyle = backround || "rgba(255, 255, 255, 0.6)";
+  ctx.fillStyle = backround || "#E0F2F7";
   ctx.beginPath();
   ctx.moveTo(x + radius, y);
   ctx.lineTo(x + width - radius, y);
@@ -423,8 +494,12 @@ function drawRoundedRect(x, y, width, height, radius) {
 function showWinScreen() {
   gameStarted = false;
   gameOver = true;
+  gameWon = true;
+  noBottlesLost = false;
   gameAudio.pause();
   stopAudio(gameOverAudio);
+  stopAudio(noBottlesAudio);
+  tryPlayWinAudio();
   const image = new Image();
   image.src = "./assets/img/You won, you lost/You Win A.png";
   image.onload = function () {
@@ -438,7 +513,10 @@ function showWinScreen() {
 function showGameOverScreen() {
   gameStarted = false;
   gameOver = true;
+  gameWon = false;
+  noBottlesLost = false;
   gameAudio.pause();
+  stopAudio(noBottlesAudio);
   tryPlayGameOverAudio();
 
   const image = new Image();
@@ -454,7 +532,12 @@ function showGameOverScreen() {
 function showNoBottlesScreen() {
   gameStarted = false;
   gameOver = true;
+  gameWon = false;
+  noBottlesLost = true;
+  gameAudio.pause();
   stopAudio(gameOverAudio);
+  stopAudio(winAudio);
+  tryPlayNoBottlesAudio();
 
   const image = new Image();
   image.src = "./assets/img/You won, you lost/You lost.png";
@@ -462,11 +545,11 @@ function showNoBottlesScreen() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
     drawRestartButton();
+    drawSpeakerIcon();
   };
 }
 
 window.addEventListener("keydown", (e) => {
-  console.log(e.keyCode);
 
   if (e.keyCode === 37) {
     kayboard.LEFT = true;

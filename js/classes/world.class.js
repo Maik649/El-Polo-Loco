@@ -12,6 +12,7 @@ class World {
   statusBarEndboss = new StatusBar("endboss", 500, 20);
 
   throwableobjekts = [];
+
   bottle = [
     new CollectebillObjekts(300, 360),
     new CollectebillObjekts(600, 360),
@@ -20,8 +21,6 @@ class World {
     new CollectebillObjekts(1500, 360),
   ];
   bottlesCollected = 0;
-  
-
 
   constructor(canvas, kayboard) {
     this.ctx = canvas.getContext("2d");
@@ -100,17 +99,22 @@ class World {
       if (this.character.isColliding(enemy)) {
         const characterBottom = this.character.y + this.character.height;
         const enemyTop = enemy.y;
-        const stompFromTop = this.character.speedY < 0 && characterBottom <= enemyTop + enemy.height / 2;
+        const stompFromTop =
+          this.character.speedY < 0 &&
+          characterBottom <= enemyTop + enemy.height / 2;
+        const isChickenEnemy = enemy instanceof Chicken || enemy instanceof ChickenSmall;
 
-        if (enemy instanceof Chicken && enemy.dead) {
+        if (isChickenEnemy && enemy.dead) {
           return;
-        } else if (enemy instanceof Chicken && stompFromTop && !enemy.dead) {
+        } else if (isChickenEnemy && stompFromTop && !enemy.dead) {
           enemy.die();
         } else if (!this.character.isHurt()) {
           this.character.hit();
           this.statusBarHealt.setPercentage(this.character.energy);
           setTimeout(() => {
-            if (this.character.isDead() && !this.gameOver &&
+            if (
+              this.character.isDead() &&
+              !this.gameOver &&
               typeof showGameOverScreen === "function"
             ) {
               this.gameOver = true;
@@ -158,7 +162,7 @@ class World {
     this.level.enemies.forEach((enemy) => {
       if (enemy instanceof Endboss) {
         const distance = Math.abs(this.character.x - enemy.x);
-        if (distance < 400) {
+        if (distance < 450) {
           enemy.activated = true;
         }
         enemy.updateMovement();

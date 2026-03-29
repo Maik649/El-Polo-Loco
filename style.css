@@ -6,6 +6,9 @@ body {
     min-height: 100vh;
     margin: 0;
     padding: 0;
+    background-image: url("./assets/img/5_background/2207_w026_n002_2274b_p1_2274.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .game-container {
