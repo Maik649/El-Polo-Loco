@@ -1,0 +1,11 @@
+@font-face {
+    font-family: Delicious;
+    src: url('./assets/fonts/StrongStitch-Regular.otf') format("opentype");
+}
+
+body {
+    font-family: Delicious, Hevetica, Arial, sans-serif;
+    font-size: 42px;
+   font-style: italic;
+    color: rgba(231, 184, 31, 0.788);
+}
