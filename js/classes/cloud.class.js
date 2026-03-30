@@ -1,3 +1,6 @@
+/**
+ * Decorative cloud entity that moves continuously from right to left.
+ */
 class Cloud extends MovableObject {
   x;
   y = 0;
@@ -5,11 +8,19 @@ class Cloud extends MovableObject {
   height = 280;
   speed = 0.1 + Math.random(this.x) * 0.35;
 
+  /**
+   * @param {string} imagePath Path to cloud sprite image.
+   */
   constructor(imagePath) {
     super().loadImage(imagePath);
     this.x = Math.random(this.x) * 500;
     this.animation();
   }
+
+  /**
+   * Starts cloud movement animation loop.
+   * @returns {void}
+   */
   animation() {
     setInterval(() => {
       this.moveLeft(this.speed);

@@ -1,4 +1,8 @@
  
+/**
+ * Creates and returns the first level configuration.
+ * @returns {Level}
+ */
 function createLevel1() {
   return new Level(
     [
@@ -100,4 +104,5 @@ function createLevel1() {
 }
 
 // Optionale globale Instanz, falls irgendwo noch direkt "level_1" verwendet wird
+/** @type {Level} */
 const level_1 = createLevel1();

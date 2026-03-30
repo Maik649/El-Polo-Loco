@@ -1,8 +1,12 @@
+/**
+ * Endboss enemy with patrol movement, hurt/dead states and activation logic.
+ */
 class Endboss extends MovableObject {
   x;
   y = 140;
   widht = 170;
-  height = 345;
+  height = 315;
+  offset = { top: 60, bottom: 10, left: 25, right: 25 };
   energy = 100;
   speed = 1;
   activated = false;
@@ -39,6 +43,9 @@ class Endboss extends MovableObject {
     "./assets/img/4_enemie_boss_chicken/1_walk/G4.png",
   ];
 
+  /**
+   * Loads all endboss sprites and initializes patrol area.
+   */
   constructor() {
     super().loadImage(this.IDELIMAGE[0]);
     this.loadeImages(this.IDELIMAGE);
@@ -51,10 +58,13 @@ class Endboss extends MovableObject {
     this.patrolRight = this.x + 200;
   }
 
+  /**
+   * Handles visual state animation for dead, hurt, active and idle states.
+   * @returns {void}
+   */
   animation() {
     setInterval(() => {
       if (this.isDead()) {
-        this.updateMovement() == false
         this.playAnimation(this.DEADIMAGE);
       } else if (this.isHurt()) {
         this.playAnimation(this.HURTIMAGE);
@@ -66,33 +76,31 @@ class Endboss extends MovableObject {
     }, 200);
   }
 
+  /**
+   * Updates horizontal patrol movement while the boss is alive and activated.
+   * @returns {void}
+   */
   updateMovement() {
-    if (!this.activated) {
-      return;
-    }
+    if (this.isDead() || !this.activated) {return;}
 
     if (this.movingLeft) {
       this.moveLeft();
       this.otherDirection = false;
-      if (this.x <= this.patrolLeft) {
-        this.movingLeft = false;
-      }
+      if (this.x <= this.patrolLeft) {this.movingLeft = false;}
     } else {
       this.moveRight();
       this.otherDirection = true;
-      if (this.x >= this.patrolRight) {
-        this.movingLeft = true;
-      }
+      if (this.x >= this.patrolRight) {this.movingLeft = true;}
     }
   }
 
+  /**
+   * Applies damage to the endboss.
+   * @returns {void}
+   */
   hit() {
     this.energy -= this.damage;
-    if (this.energy < 0) {
-      this.energy = 0;
-    }
-    if (this.energy > 0) {
-      this.lastHit = new Date().getTime();
-    }
+    if (this.energy < 0) {this.energy = 0;}
+    if (this.energy > 0) {this.lastHit = new Date().getTime();}
   }
 }

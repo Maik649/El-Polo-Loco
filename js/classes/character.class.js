@@ -1,11 +1,14 @@
+/**
+ * Main playable character class.
+ * Handles movement input, animation state and idle/long-idle transitions.
+ */
 class Character extends MovableObject {
   x = 100;
   y = 170;
   widht = 100;
   height = 250;
+  offset = { top: 60, bottom: 10, left: 25, right: 25 };
   workingAudio = new Audio("./assets/audios/freesound_community-running-1-6846.mp3",);
-  
-  
 
   IDELIMAGE = [
     "./assets/img/2_character_pepe/1_idle/idle/I-1.png",
@@ -71,6 +74,9 @@ class Character extends MovableObject {
   world;
   speed = 10;
 
+  /**
+   * Initializes character sprites and starts movement/animation loops.
+   */
   constructor() {
     super().loadImage("./assets/img/2_character_pepe/1_idle/idle/I-1.png");
     this.loadeImages(this.IDELIMAGE);
@@ -81,30 +87,28 @@ class Character extends MovableObject {
     this.loadeImages(this.HURTIMAGE);
     this.animation();
     this.applayGravity();
-    
   }
 
+  /**
+   * Starts character update and animation intervals.
+   * @returns {void}
+   */
   animation() {
     setInterval(() => {
       this.workingAudio.pause();
       this.isWork();
 
-      if (this.world.kayboard.SPACE && !this.isAboveGound()) {
-        this.jump();
-      }
+      if (this.world.kayboard.SPACE && !this.isAboveGound()) {this.jump();}
       this.world.camara_x = -this.x + 100;
     }, 1000 / 60);
 
     setInterval(() => {
       const isMoving = this.world.kayboard.LEFT || this.world.kayboard.RIGHT;
-      const isAction = this.world.kayboard.SPACE || this.world.kayboard.D;
+      const isAction = this.world.kayboard.SPACE;
       const isInAir = this.isAboveGound();
       const isHurtOrDead = this.isHurt() || this.isDead();
 
-      if (isMoving || isAction || isInAir || isHurtOrDead) {
-        this.currentClock = 0;
-        return;
-      }
+      if (isMoving || isAction || isInAir || isHurtOrDead) { this.currentClock = 0;return;}
 
       if (this.currentClock < 30) {
         this.playAnimation(this.IDELIMAGE);
@@ -115,18 +119,36 @@ class Character extends MovableObject {
     }, 250);
 
     setInterval(() => {
-
       if (this.isDead()) {
         this.playAnimation(this.DEATIMAGE);
       } else if (this.isHurt()) {
         this.playAnimation(this.HURTIMAGE);
-      }else if (this.isAboveGound()) {
+      } else if (this.isAboveGound()) {
         this.playAnimation(this.JUMPIMAGE);
       } else {
-        if (this.world.kayboard.LEFT || this.world.kayboard.RIGHT) {
-          this.playAnimation(this.WORKIMAGE);
-        }
+        if (this.world.kayboard.LEFT || this.world.kayboard.RIGHT) {this.playAnimation(this.WORKIMAGE);}
       }
     }, 150);
   }
+
+  /**
+   * Checks if the character can play idle animations.
+   * @returns {boolean}
+   */
+  canBeIdle() {
+    const isMoving = this.world.kayboard.LEFT || this.world.kayboard.RIGHT;
+    const isInAir = this.isAboveGound();
+    const isHurtOrDead = this.isHurt() || this.isDead();
+    return !isMoving && !isInAir && !isHurtOrDead;
+  }
+
+  /**
+   * @returns {boolean} True when long-idle animation should be active.
+   */
+  isInLongIdleMode() { return this.canBeIdle() && this.currentClock >= 30;}
+
+  /**
+   * @returns {boolean} True when normal idle animation should be active.
+   */
+  isInIdleMode() {return this.canBeIdle() && this.currentClock < 30;}
 }

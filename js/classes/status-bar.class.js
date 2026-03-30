@@ -1,5 +1,13 @@
+/**
+ * Generic status bar class for health, bottles, coins and endboss health.
+ */
 class StatusBar extends DrawableObjekt {
   imageSet;
+  /**
+   * @param {"health"|"endboss"|"bottle"|"coins"} type Status bar type.
+   * @param {number} x Horizontal canvas position.
+   * @param {number} y Vertical canvas position.
+   */
   constructor(type, x, y) {
     super();
     if (type === "health") {
@@ -91,12 +99,22 @@ class StatusBar extends DrawableObjekt {
     this.setPercentageBottel(0);
   }
 
+  /**
+   * Sets percentage with standard fill direction.
+   * @param {number} persenttage Value between 0 and 100.
+   * @returns {void}
+   */
   setPercentage(persenttage) {
     this.persenttage = persenttage;
     let path = this.imageSet[this.resolveImageIndex()];
     this.img = this.imageCache[path];
   }
 
+  /**
+   * Sets percentage with reversed fill direction.
+   * @param {number} persenttage Value between 0 and 100.
+   * @returns {void}
+   */
   setPercentageBottel(persenttage) {
     this.persenttage = persenttage;
     let path = this.imageSet[this.resolveImageIndex_1()];

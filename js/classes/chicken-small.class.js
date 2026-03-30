@@ -1,9 +1,13 @@
+/**
+ * Small chicken enemy variant with different size and jump behavior.
+ */
 class ChickenSmall extends MovableObject {
   x;
   y = 400;
   groundLevel = 400;
   widht = 60;
   height = 40;
+  offset = { top: 3, bottom: 3, left: 5, right: 5 };
   dead = false;
   speed = 0.1 + Math.random(this.x) * 0.45;
   WORKIMAGE = [
@@ -14,6 +18,9 @@ class ChickenSmall extends MovableObject {
 
   DEADIMAGE = "./assets/img/3_enemies_chicken/chicken_small/2_dead/dead.png";
 
+  /**
+   * Loads sprites, randomizes spawn position and starts animation.
+   */
   constructor() {
     super().loadImage(
       "./assets/img/3_enemies_chicken/chicken_small/1_walk/1_w.png",
@@ -25,6 +32,10 @@ class ChickenSmall extends MovableObject {
     this.animation();
   }
 
+  /**
+   * Starts movement and animation loops for the enemy.
+   * @returns {void}
+   */
   animation() {
     setInterval(() => {
       if (!this.dead) {
@@ -40,6 +51,10 @@ class ChickenSmall extends MovableObject {
     }, 200);
   }
 
+  /**
+   * Switches the small chicken into dead state.
+   * @returns {void}
+   */
   die() {
     this.dead = true;
     this.speed = 0;
