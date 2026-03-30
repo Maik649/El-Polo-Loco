@@ -100,11 +100,11 @@ button {
 }
 
 canvas {
-
+    display: block;
     width: 100%;
     max-width: 720px;
-    height: auto;
-    display: block;
+    max-height: 100vh;
+    height: 460px;
 }
 
 .mobile-controls {
@@ -184,7 +184,7 @@ canvas {
     }
 } 
 
-@media only screen and (max-width: 760px) {
+@media only screen and (max-width: 960px) {
 
     body.legal-page {
         padding: 16px;
@@ -224,6 +224,34 @@ canvas {
 canvas {
         height: 100vh;
     }
+        body.legal-page {
+            padding: 16px;
+        }
+    
+        .legal-card {
+            padding: 20px;
+            border-radius: 18px;
+        }
+    
+        .game-container h1 {
+            display: none;
+        }
+    
+        .game-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
+    
+        .mobile-controls {
+            display: flex;
+            position: absolute;
+            bottom: 25px;
+            max-width: 99vw;
+        }
 }
 
 .game-container:fullscreen,
