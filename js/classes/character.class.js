@@ -103,7 +103,7 @@ class Character extends MovableObject{
       }
       this.world.camara_x = -this.x + 100;
     }, 1000 / 60);
-    this.kayboardCheck();
+    this.kayboardCheckvorAnimation();
     this.setAnimationenCheck();
   }
   /**
@@ -123,13 +123,13 @@ class Character extends MovableObject{
           this.playAnimation(this.WORKIMAGE);
         }
       }
-    }, 100);
+    }, 80);
   }
   /**
    * Checks if the Input can play.
    * @returns {boolean}
    */
-  kayboardCheck() {
+  kayboardCheckvorAnimation() {
     setInterval(() => {
       const isMoving = this.world.kayboard.LEFT || this.world.kayboard.RIGHT;
       const isAction = this.world.kayboard.SPACE;

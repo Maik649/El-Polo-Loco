@@ -19,9 +19,7 @@ class World {
 
   bottle = [
     new CollectebillObjekts(200, 360),
-    new CollectebillObjekts(300, 360),
     new CollectebillObjekts(600, 360),
-    new CollectebillObjekts(700, 360),
     new CollectebillObjekts(900, 360),
     new CollectebillObjekts(1200, 360),
     new CollectebillObjekts(1450, 360),

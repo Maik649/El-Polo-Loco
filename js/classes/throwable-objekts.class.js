@@ -4,7 +4,7 @@
 class ThrowableObjekts extends MovableObject {
   x = 360;
   groundLevel = 360;
-  acceleratio = 1.8 ;
+  acceleratio = 2.5;
   broken = false;
   markedForRemoval = false;
   throwInterval = null;
