@@ -9,7 +9,12 @@ class Endboss extends MovableObject {
   offset = { top: 60, bottom: 10, left: 25, right: 25 };
   energy = 100;
   speed = 1;
+  defaultSpeed = 1;
+  attackSpeed = 2.5;
+  attackModeDuration = 2500;
+  attackModeTimeout = null;
   activated = false;
+  chasingCharacter = false;
   patrolLeft;
   patrolRight;
   movingLeft = true;
@@ -42,6 +47,16 @@ class Endboss extends MovableObject {
     "./assets/img/4_enemie_boss_chicken/1_walk/G3.png",
     "./assets/img/4_enemie_boss_chicken/1_walk/G4.png",
   ];
+  ATTACKIMAGE = [
+    "./assets/img/4_enemie_boss_chicken/3_attack/G13.png",
+    "./assets/img/4_enemie_boss_chicken/3_attack/G14.png",
+    "./assets/img/4_enemie_boss_chicken/3_attack/G15.png",
+    "./assets/img/4_enemie_boss_chicken/3_attack/G16.png",
+    "./assets/img/4_enemie_boss_chicken/3_attack/G17.png",
+    "./assets/img/4_enemie_boss_chicken/3_attack/G18.png",
+    "./assets/img/4_enemie_boss_chicken/3_attack/G19.png",
+    "./assets/img/4_enemie_boss_chicken/3_attack/G20.png",
+  ];
 
   /**
    * Loads all endboss sprites and initializes patrol area.
@@ -50,6 +65,7 @@ class Endboss extends MovableObject {
     super().loadImage(this.IDELIMAGE[0]);
     this.loadeImages(this.IDELIMAGE);
     this.loadeImages(this.WORKIMAGE);
+    this.loadeImages(this.ATTACKIMAGE);
     this.loadeImages(this.HURTIMAGE);
     this.loadeImages(this.DEADIMAGE);
     this.x = 1400 + Math.random(this.x) * 500;
@@ -68,6 +84,8 @@ class Endboss extends MovableObject {
         this.playAnimation(this.DEADIMAGE);
       } else if (this.isHurt()) {
         this.playAnimation(this.HURTIMAGE);
+      } else if (this.chasingCharacter) {
+        this.playAnimation(this.ATTACKIMAGE);
       } else if (this.activated) {
         this.playAnimation(this.WORKIMAGE);
       } else {
@@ -80,9 +98,29 @@ class Endboss extends MovableObject {
    * Updates horizontal patrol movement while the boss is alive and activated.
    * @returns {void}
    */
-  updateMovement() {
+  updateMovement(characterX) {
     if (this.isDead() || !this.activated) {return;}
 
+    if (this.chasingCharacter && typeof characterX === "number") {
+      this.speed = this.attackSpeed;
+      if (this.x > characterX) {
+        this.moveLeft();
+        this.otherDirection = false;
+      } else {
+        this.moveRight();
+        this.otherDirection = true;
+      }
+      return;
+    }
+    this.setAttakMove();
+  }
+
+  /**
+   *  Set Attak Move
+   * @returns 
+   */
+  setAttakMove() {
+    this.speed = this.defaultSpeed;
     if (this.movingLeft) {
       this.moveLeft();
       this.otherDirection = false;
@@ -91,7 +129,25 @@ class Endboss extends MovableObject {
       this.moveRight();
       this.otherDirection = true;
       if (this.x >= this.patrolRight) {this.movingLeft = true;}
+    }}
+
+  /**
+   *  Start Attak Mode
+   * @returns 
+   */
+  startAttackMode() {
+    if (this.isDead()) {return;}
+    this.activated = true;
+    this.chasingCharacter = true;
+
+    if (this.attackModeTimeout) {
+      clearTimeout(this.attackModeTimeout);
     }
+
+    this.attackModeTimeout = setTimeout(() => {
+      this.chasingCharacter = false;
+      this.attackModeTimeout = null;
+    }, this.attackModeDuration);
   }
 
   /**

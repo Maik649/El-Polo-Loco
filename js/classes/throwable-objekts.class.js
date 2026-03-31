@@ -36,16 +36,10 @@ class ThrowableObjekts extends MovableObject {
     this.speedY = 25;
     this.otherDirection = otherDirection;
     this.applayGravity();
-
     this.throwInterval = setInterval(() => {
-      if (this.broken) {
-        return;
-      }
-
+      if (this.broken) { return;}
       this.x += this.otherDirection ? -8 : 8;
-      if (this.hasHitGround()) {
-        this.breakBottle();
-      }
+      if (this.hasHitGround()) {this.breakBottle();}
     }, 1000 / 60);
   }
 
@@ -61,23 +55,16 @@ class ThrowableObjekts extends MovableObject {
    * @returns {void}
    */
   breakBottle() {
-    if (this.broken) {
-      return;
-    }
-
+    if (this.broken) {return;}
     this.broken = true;
     this.speedY = 0;
     this.y = this.groundLevel;
     this.img = this.imageCache[this.SPLASH_IMAGE];
-
     if (this.throwInterval) {
       clearInterval(this.throwInterval);
       this.throwInterval = null;
     }
-
-    setTimeout(() => {
-      this.markedForRemoval = true;
-    }, 180);
+    setTimeout(() => {this.markedForRemoval = true;}, 180);
   }
 
   /**

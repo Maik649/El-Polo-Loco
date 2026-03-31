@@ -59,6 +59,9 @@ class StatusBar extends DrawableObjekt {
     "./assets/img/7_statusbars/1_statusbar/3_statusbar_bottle/orange/0.png",
   ];
 
+  /**
+   * Health Bar .
+   */
   initHealthBar(x, y) {
     this.imageSet = this.STATUSBARHEALTHIMAGE;
     this.loadeImages(this.imageSet);
@@ -68,7 +71,9 @@ class StatusBar extends DrawableObjekt {
     this.height = 50;
     this.setPercentage(100);
   }
-
+  /**
+   * init Endboss Bar.
+   */
   initEndbossBar(x, y) {
     this.imageSet = this.STATUSBARENDBOSSIMAGE;
     this.loadeImages(this.imageSet);
@@ -78,7 +83,9 @@ class StatusBar extends DrawableObjekt {
     this.height = 50;
     this.setPercentage(100);
   }
-
+  /**
+   * initBottle Bar.
+   */
   initBottleBar(x, y) {
     this.imageSet = this.STATUSBARBOTTLKEIMAGE;
     this.loadeImages(this.imageSet);
@@ -88,7 +95,9 @@ class StatusBar extends DrawableObjekt {
     this.height = 50;
     this.setPercentageBottel(0);
   }
-
+  /**
+   * init Coins Bar
+   */
   initCoinsBar(x, y) {
     this.imageSet = this.STATUSBARCOINSIMAGE;
     this.loadeImages(this.imageSet);
@@ -120,9 +129,11 @@ class StatusBar extends DrawableObjekt {
     let path = this.imageSet[this.resolveImageIndex_1()];
     this.img = this.imageCache[path];
   }
-
+  /**
+   * resolve Image Index
+   */
   resolveImageIndex() {
-    if (this.persenttage == 100 ) {
+    if (this.persenttage == 100) {
       return 5;
     } else if (this.persenttage > 80) {
       return 4;
@@ -136,17 +147,18 @@ class StatusBar extends DrawableObjekt {
       return 0;
     }
   }
-
+  /**
+   * resolve Image Index 1
+   */
   resolveImageIndex_1() {
-   
     if (this.persenttage == 0) {
-      return 5; 
+      return 5;
     } else if (this.persenttage <= 20) {
-      return 4; 
+      return 4;
     } else if (this.persenttage <= 40) {
-      return 3; 
+      return 3;
     } else if (this.persenttage <= 60) {
-      return 2; 
+      return 2;
     } else if (this.persenttage <= 80) {
       return 1;
     } else {

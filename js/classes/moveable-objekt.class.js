@@ -8,7 +8,7 @@ class MovableObject extends DrawableObjekt {
   currentImage = 0;
   speed = 0.015;
   speedY = 0;
-  acceleratio = 1;
+  acceleratio = 1.6;
   otherDirection = false;
   energy = 100;
   lastHit = 0;
@@ -128,7 +128,7 @@ class MovableObject extends DrawableObjekt {
           this.speedY = 0;
         }
       }
-    }, 1000 / 25);
+    }, 1000 / 20);
   };
 
   /**
