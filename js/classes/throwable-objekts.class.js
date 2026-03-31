@@ -3,8 +3,8 @@
  */
 class ThrowableObjekts extends MovableObject {
   x = 360;
-  groundLevel = 360;
-  acceleratio = 2.5;
+  groundLevel = 320;
+  acceleratio = 3;
   broken = false;
   markedForRemoval = false;
   throwInterval = null;

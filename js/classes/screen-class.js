@@ -281,7 +281,7 @@ class GameScreen {
     this.ctx.font = "18px Arial";
     this.ctx.textAlign = "center";
     this.ctx.textBaseline = "middle";
-    this.ctx.fillText("NOCHMAL",
+    this.ctx.fillText("Zurück zum Start",
       this.restartButton.x + this.restartButton.width / 2,
       this.restartButton.y + this.restartButton.height / 2,
     );
@@ -432,11 +432,27 @@ class GameScreen {
    */
   checkOrientation() {
     const overlay = document.getElementById("orientationOverlay");
+    const isTouchDevice = this.isTouchDevice();
     const isLandscape = window.matchMedia("(orientation: landscape)").matches;
 
     if (!overlay) {return;}
 
-    overlay.style.display = isLandscape ? "none" : "flex";
+    overlay.style.display = isTouchDevice && !isLandscape ? "flex" : "none";
+
+    if (isTouchDevice && isLandscape) {
+      this.requestFullscreen();
+    }
+  }
+
+  /**
+   * Detects if the current device is touch-first.
+   * @returns {boolean}
+   */
+  isTouchDevice() {
+    return (
+      window.matchMedia("(pointer: coarse)").matches ||
+      navigator.maxTouchPoints > 0
+    );
   }
 
   /**
@@ -465,12 +481,22 @@ class GameScreen {
     const elem = document.getElementById("gameContainer");
     if (!elem) { return;}
 
+    if (document.fullscreenElement) {
+      return;
+    }
+
+    let requestResult;
+
     if (elem.requestFullscreen) {
-      elem.requestFullscreen();
+      requestResult = elem.requestFullscreen();
     } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen();
+      requestResult = elem.webkitRequestFullscreen();
     } else if (elem.msRequestFullscreen) {
-      elem.msRequestFullscreen();
+      requestResult = elem.msRequestFullscreen();
+    }
+
+    if (requestResult && typeof requestResult.catch === "function") {
+      requestResult.catch(() => {});
     }
   }
 }

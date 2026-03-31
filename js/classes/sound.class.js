@@ -44,7 +44,7 @@ class SoundManager {
   createTrack(src, loop = false) {
     const track = new Audio(src);
     track.loop = loop;
-    track.volume = 0.25;
+    track.volume = 0.10
     track.preload = "auto";
     return track;
   }

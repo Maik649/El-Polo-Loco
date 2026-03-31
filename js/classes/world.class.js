@@ -8,6 +8,7 @@ class World {
   canvas;
   ctx;
   kayboard;
+  soundManager;
   camara_x = 0;
   gameOver = false;
   statusBarCoins = new StatusBar("coins", 20, 20);
@@ -38,11 +39,13 @@ class World {
   /**
    * @param {HTMLCanvasElement} canvas Target game canvas.
    * @param {Kayboard} kayboard Keyboard state container.
+   * @param {SoundManager} soundManager Shared audio manager.
    */
-  constructor(canvas, kayboard) {
+  constructor(canvas, kayboard, soundManager) {
     this.ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.kayboard = kayboard;
+    this.soundManager = soundManager;
 
     if (typeof createLevel1 === "function") {
       this.level = createLevel1();
@@ -103,6 +106,7 @@ class World {
    * @returns {void}
    */
   run() {
+    this.statusBarHealt.setPercentage(this.character.energy);
     this.checkCollisons();
     this.checkThowableObjeks();
     this.updateThrowableObjekts();
@@ -254,7 +258,7 @@ class World {
         this.gameOver = true;
         showGameOverScreen();
       }
-    }, 2000);
+    }, 1000 / 60);
   }
   /**
    * Handle Bottle Hits On Endboss.

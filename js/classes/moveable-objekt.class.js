@@ -30,16 +30,24 @@ class MovableObject extends DrawableObjekt {
    * @returns {void}
    */
   isWork() {
+    const canPlayWorkingSound =
+      this.workingAudio &&
+      (!this.world?.soundManager || !this.world.soundManager.isMuted());
+
     if (this.world.kayboard.LEFT && this.x > 100) {
       this.moveLeft();
       this.otherDirection = true;
-      this.workingAudio.play();
+      if (canPlayWorkingSound) {
+        this.workingAudio.play();
+      }
     };
 
     if (this.world.kayboard.RIGHT && this.x < this.world.level.level_end_x) {
       this.moveRight();
       this.otherDirection = false;
-      this.workingAudio.play();
+      if (canPlayWorkingSound) {
+        this.workingAudio.play();
+      }
     };
   };
 
@@ -89,7 +97,7 @@ class MovableObject extends DrawableObjekt {
    * @returns {void}
    */
   hit() {
-    this.energy -= 5;
+    this.energy -= 20;
     if (this.energy < 0) {
       this.energy = 0;
     } else {

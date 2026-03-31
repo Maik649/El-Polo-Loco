@@ -7,6 +7,7 @@ let world;
 let kayboard = new Kayboard();
 let screenManager;
 let backToStartButton;
+let nochmalButton;
 let soundManager;
 let gameStarted = false;
 let gameOver = false;
@@ -23,43 +24,55 @@ function init() {
   canvas = document.getElementById("gameCanvas");
   ctx = canvas.getContext("2d");
   backToStartButton = document.getElementById("backToStartBtn");
-  soundManager = new SoundManager(MUSIC_MUTED_STORAGE_KEY);
-  screenManager = new GameScreen();
-  screenManager.setCanvas(canvas, ctx);
-  soundManager.init();
-  musicMuted = soundManager.loadMutedState();
-  soundManager.initUnlock(() => {
-    if (!musicMuted) {
-      playActiveSceneAudio();
-    }
-  });
+  nochmalButton = document.getElementById("nochmalBtn");
+  initManagers();
+  initSound();
   showStartScreen();
   screenManager.checkOrientation();
   initMobileControls();
   initBackToStartButton();
-
+  initNochmalButton();
+  initEventListeners();
+}
+/**
+ * Creates and wires up screen and sound manager instances.
+ * @returns {void}
+ */
+function initManagers() {
+  soundManager = new SoundManager(MUSIC_MUTED_STORAGE_KEY);
+  screenManager = new GameScreen();
+  screenManager.setCanvas(canvas, ctx);
+}
+/**
+ * Initializes audio, loads mute state and registers unlock callback.
+ * @returns {void}
+ */
+function initSound() {
+  soundManager.init();
+  musicMuted = soundManager.loadMutedState();
+  soundManager.initUnlock(() => {
+    if (!musicMuted) {playActiveSceneAudio();}
+  });
+}
+/**
+ * Registers canvas and window event listeners.
+ * @returns {void}
+ */
+function initEventListeners() {
   canvas.addEventListener("click", handleCanvasClick);
   canvas.addEventListener("mousemove", handleCanvasMouseMove);
   canvas.addEventListener("mouseleave", handleCanvasMouseLeave);
   window.addEventListener("resize", handleResize);
 }
-
 /**
  * Plays the matching audio for the currently visible game scene.
  * @returns {void}
  */
 function playActiveSceneAudio() {
-  const scene = gameWon
-    ? "win"
-    : noBottlesLost
-      ? "noBottles"
-      : gameOver
-        ? "gameOver"
-        : "game";
+  const scene = gameWon ? "win": noBottlesLost? "noBottles": gameOver ? "gameOver" : "game";
 
   soundManager.playScene(scene);
 }
-
 /**
  * Wires the back-to-start button click handler.
  * @returns {void}
@@ -68,16 +81,26 @@ function initBackToStartButton() {
   if (!backToStartButton) {return;}
   backToStartButton.addEventListener("click", returnToStartScreen);
 }
-
+/**
+ * Wires the nochmal button click handler.
+ * @returns {void}
+ */
+function initNochmalButton() {
+  if (!nochmalButton) {return;}
+  nochmalButton.addEventListener("click", quickRestartGame);
+}
 /**
  * Toggles visibility for the back-to-start button depending on game state.
  * @returns {void}
  */
 function updateBackToStartButtonVisibility() {
-  if (!backToStartButton) { return;}
-  backToStartButton.style.display = gameStarted && !gameOver ? "block" : "none";
+  if (backToStartButton) {
+    backToStartButton.style.display = gameStarted && !gameOver ? "block" : "none";
+  }
+  if (nochmalButton) {
+    nochmalButton.style.display = gameOver ? "block" : "none";
+  }
 }
-
 /**
  * Stops the current world loop and clears the world reference.
  * @returns {void}
@@ -88,7 +111,6 @@ function stopWorldIfRunning() {
   world.gameOver = true;
   world = null;
 }
-
 /**
  * Resets all keyboard flags to their default unpressed state.
  * @returns {void}
@@ -101,7 +123,6 @@ function resetKeyboardState() {
   kayboard.SPACE = false;
   kayboard.D = false;
 }
-
 /**
  * Returns from an active run back to the start screen.
  * @returns {void}
@@ -116,7 +137,6 @@ function returnToStartScreen() {
   soundManager.stopTracks(["gameOver", "win", "noBottles"]);
   showStartScreen();
 }
-
 /**
  * Delegates canvas click handling to the screen manager.
  * @param {MouseEvent} event Browser click event.
@@ -129,7 +149,6 @@ function handleCanvasClick(event) {
     { startGame, restartGame, toggleMusic },
   );
 }
-
 /**
  * Delegates canvas hover handling to the screen manager.
  * @param {MouseEvent} event Browser mouse move event.
@@ -138,7 +157,6 @@ function handleCanvasClick(event) {
 function handleCanvasMouseMove(event) {
   screenManager.handleCanvasMouseMove(event, { gameStarted, gameOver });
 }
-
 /**
  * Restores default cursor when the pointer leaves the canvas.
  * @returns {void}
@@ -146,7 +164,6 @@ function handleCanvasMouseMove(event) {
 function handleCanvasMouseLeave() {
   screenManager.resetCanvasCursor();
 }
-
 /**
  * Updates responsive canvas UI state on window resize.
  * @returns {void}
@@ -155,7 +172,6 @@ function handleResize() {
   screenManager.updateIconPositions();
   screenManager.checkOrientation();
 }
-
 /**
  * Binds a control button to press/release callbacks.
  * @param {string} buttonId Target button id.
@@ -166,27 +182,50 @@ function handleResize() {
 function bindControlButton(buttonId, onPress, onRelease) {
   const button = document.getElementById(buttonId);
   if (!button) return;
-  const start = (event) => { event.preventDefault(); onPress();};
-  const end = (event) => { event.preventDefault(); onRelease();};
-  button.addEventListener("touchstart", start);
-  button.addEventListener("touchend", end);
-  button.addEventListener("touchcancel", end);
-  button.addEventListener("mousedown", start);
-  button.addEventListener("mouseup", end);
-  button.addEventListener("mouseleave", end);
-}
+  const start = (event) => {
+    event.preventDefault();
+    onPress();
+  };
+  const end = (event) => {
+    event.preventDefault();
+    onRelease();
+  };
 
+  // Prefer pointer events to support modern mobile browsers consistently.
+  if (window.PointerEvent) {
+    button.addEventListener("pointerdown", start);
+    button.addEventListener("pointerup", end);
+    button.addEventListener("pointercancel", end);
+    button.addEventListener("pointerleave", end);
+  } else {
+    button.addEventListener("touchstart", start, { passive: false });
+    button.addEventListener("touchend", end, { passive: false });
+    button.addEventListener("touchcancel", end, { passive: false });
+    button.addEventListener("mousedown", start);
+    button.addEventListener("mouseup", end);
+    button.addEventListener("mouseleave", end);
+  }
+
+  button.addEventListener("contextmenu", (event) => event.preventDefault());
+}
 /**
  * Initializes touch/mouse bindings for mobile control buttons.
  * @returns {void}
  */
 function initMobileControls() {
+  const isTouchDevice = screenManager.isTouchDevice();
+  document.body.classList.toggle("touch-device", isTouchDevice);
+
+  if (!isTouchDevice) {return;}
+
   bindControlButton("btn-left",() => (kayboard.LEFT = true),() => (kayboard.LEFT = false),);
   bindControlButton("btn-right",() => (kayboard.RIGHT = true),() => (kayboard.RIGHT = false),);
   bindControlButton("btn-jump",() => (kayboard.SPACE = true),() => (kayboard.SPACE = false),);
   bindControlButton("btn-throw",() => (kayboard.D = true),() => (kayboard.D = false),);
-}
 
+  // Ensure controls are released if the app loses focus while a button is held.
+  window.addEventListener("blur", resetKeyboardState);
+}
 /**
  * Starts a new game world and updates UI/audio state.
  * @returns {void}
@@ -196,7 +235,8 @@ function startGame() {
   gameOver = false;
   gameWon = false;
   noBottlesLost = false;
-  world = new World(canvas, kayboard);
+  world = new World(canvas, kayboard, soundManager);
+  screenManager.checkOrientation();
   soundManager.stopTracks(["gameOver", "win", "noBottles"]);
   soundManager.playGame();
   updateBackToStartButtonVisibility();
@@ -208,6 +248,16 @@ function startGame() {
  */
 function restartGame() {
   returnToStartScreen();
+}
+
+/**
+ * Restarts the game directly without going to the start screen.
+ * @returns {void}
+ */
+function quickRestartGame() {
+  stopWorldIfRunning();
+  resetKeyboardState();
+  startGame();
 }
 
 /**
@@ -236,6 +286,9 @@ function toggleMusic() {
   musicMuted = soundManager.toggleMute();
   if (musicMuted) {
     soundManager.pauseAll();
+    if (world?.character?.workingAudio) {
+      world.character.workingAudio.pause();
+    }
   } else {
     playActiveSceneAudio();
   }
@@ -250,6 +303,8 @@ function showWinScreen() {
   gameOver = true;
   gameWon = true;
   noBottlesLost = false;
+  resetKeyboardState();
+  if (world) {world.gameOver = true;}
   soundManager.stopTrack("game", false);
   soundManager.stopTracks(["gameOver", "noBottles"]);
   soundManager.playWin();
@@ -265,6 +320,8 @@ function showGameOverScreen() {
   gameOver = true;
   gameWon = false;
   noBottlesLost = false;
+  resetKeyboardState();
+  if (world) {world.gameOver = true;}
   soundManager.stopTrack("game", false);
   soundManager.stopTracks(["noBottles"]);
   soundManager.playGameOver();
@@ -280,6 +337,8 @@ function showNoBottlesScreen() {
   gameOver = true;
   gameWon = false;
   noBottlesLost = true;
+  resetKeyboardState();
+  if (world) {world.gameOver = true;}
   soundManager.stopTrack("game", false);
   soundManager.stopTracks(["gameOver", "win"]);
   soundManager.playNoBottles();

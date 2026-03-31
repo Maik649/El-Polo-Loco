@@ -95,6 +95,11 @@ class Character extends MovableObject{
    */
   animation() {
     setInterval(() => {
+      if (!this.world || this.world.gameOver) {
+        this.workingAudio.pause();
+        return;
+      }
+
       this.workingAudio.pause();
       this.isWork();
 
@@ -112,6 +117,8 @@ class Character extends MovableObject{
    */
   setAnimationenCheck() {
     setInterval(() => {
+      if (!this.world || this.world.gameOver) {return;}
+
       if (this.isDead()) {
         this.playAnimation(this.DEATIMAGE);
       } else if (this.isHurt()) {
@@ -131,6 +138,8 @@ class Character extends MovableObject{
    */
   kayboardCheckvorAnimation() {
     setInterval(() => {
+      if (!this.world || this.world.gameOver) {return;}
+
       const isMoving = this.world.kayboard.LEFT || this.world.kayboard.RIGHT;
       const isAction = this.world.kayboard.SPACE;
       const isInAir = this.isAboveGound();
