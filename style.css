@@ -47,7 +47,7 @@ body.legal-page {
 
 .legal-section {
     margin-top: 24px;
-    font-size: medium ;
+    font-size: medium;
 }
 
 .legal-list {
@@ -61,7 +61,7 @@ body.legal-page {
     font-size: 24px;
 }
 
-h1{
+h1 {
     margin: 0;
 }
 
@@ -80,17 +80,19 @@ button {
 }
 
 .back-to-start-btn {
-    position: absolute;
-    top: 10px;
-    left: 10px;
+    position: fixed;
+    top: calc(5px + 5px);
+    right: calc(50% - 150px);
     z-index: 20;
+    height: calc(30px + 20px);
+    width: calc(250px + 50px);
     border: none;
     border-radius: 8px;
     padding: 8px 12px;
-    font-size: 14px;
+    font-size: 26px;
     font-weight: 700;
-    color: #fff7ef;
-    background: rgba(226, 225, 224, 0.82);
+    color: rgba(255, 253, 253, 0.822);
+    background: rgba(122, 122, 122, 0.6);
     cursor: pointer;
     display: none;
 }
@@ -99,11 +101,32 @@ button {
     background: rgba(187, 186, 185, 0.92);
 }
 
+.nochmal-btn {
+    display: none;
+    position: fixed;
+    height: calc(30px + 20px);
+    width: calc(250px + 50px);
+    border-radius: 8px;
+    top: calc(5px + 5px);
+    right: calc(50% - 148px);
+    border: none;
+    padding: 8px 12px;
+    font-size: 32px;
+    font-weight: 700;
+    color: rgba(255, 253, 253, 0.822);
+    background: rgba(122, 122, 122, 0.6);
+    cursor: pointer;
+    z-index: 20;
+}
+
+.nochmal-btn:hover {
+    background: rgba(187, 186, 185, 0.92);
+}
+
 canvas {
     display: block;
     width: 100%;
     max-width: 720px;
-    max-height: 100vh;
     height: 480px;
 }
 
@@ -113,12 +136,16 @@ canvas {
     max-width: 720px;
     padding: 0 16px;
     box-sizing: border-box;
-    display: flex;
+    display: none;
     justify-content: space-between;
     align-items: center;
     gap: 16px;
     user-select: none;
     touch-action: manipulation;
+}
+
+body.touch-device .mobile-controls {
+    display: flex;
 }
 
 .mobile-controls-group {
@@ -136,6 +163,10 @@ canvas {
     justify-content: center;
     align-items: center;
     background-color: #ffffff8f;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
 }
 
 .mobile-btn img {
@@ -168,7 +199,7 @@ canvas {
     font-size: 1.2rem;
 }
 
-@media only screen and (min-width: 1440px) {
+@media (min-width: 1440px) and (max-width: 1920px) and (pointer: fine) {
     .mobile-controls {
         display: none;
     }
@@ -181,22 +212,13 @@ canvas {
         height: 100%;
         max-width: 720px;
     }
-} 
-@media only screen and(max-width: 1290px) {
-    .mobile-controls {
-        display: flex;
-    }
-
-    .game-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        height: 100%;
-        max-width: 720px;
-    }
 }
-@media only screen and (max-width: 1140px) {
+
+@media only screen and (max-width: 1440px) and (pointer: coarse) {
+    canvas {
+        height: 100vh;
+        width: 100vw;
+    }
 
     body.legal-page {
         padding: 16px;
@@ -208,7 +230,7 @@ canvas {
     }
 
     .game-container h1 {
-        display: flex;
+        display: none;
     }
 
     .game-container {
@@ -226,44 +248,78 @@ canvas {
         bottom: 25px;
         max-width: 99vw;
     }
+}
 
+@media only screen and (max-width: 768px) and (pointer: coarse) {
     canvas {
-        width: 100%;
+        height: 100vh;
+        width: 100vw;
+    }
+
+    body.legal-page {
+        padding: 16px;
+    }
+
+    .legal-card {
+        padding: 20px;
+        border-radius: 18px;
+    }
+
+    .game-container h1 {
+        display: none;
+    }
+
+    .game-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: 100%;
+        width: 100vw;
+    }
+
+    .mobile-controls {
+        display: flex;
+        position: absolute;
+        bottom: 25px;
+        max-width: 99vw;
     }
 }
 
-@media only screen and (max-width: 480px) {
-canvas {
+@media only screen and (max-width: 480px) and (pointer: coarse) {
+    canvas {
         height: 100vh;
+        width: 100vw;
     }
-        body.legal-page {
-            padding: 16px;
-        }
-    
-        .legal-card {
-            padding: 20px;
-            border-radius: 18px;
-        }
-    
-        .game-container h1 {
-            display: none;
-        }
-    
-        .game-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            height: 100%;
-            width: 100vw;
-        }
-    
-        .mobile-controls {
-            display: flex;
-            position: absolute;
-            bottom: 25px;
-            max-width: 99vw;
-        }
+
+    body.legal-page {
+        padding: 16px;
+    }
+
+    .legal-card {
+        padding: 20px;
+        border-radius: 18px;
+    }
+
+    .game-container h1 {
+        display: none;
+    }
+
+    .game-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: 100%;
+        width: 100vw;
+    }
+
+    .mobile-controls {
+        display: flex;
+        position: absolute;
+        bottom: 25px;
+        max-width: 99vw;
+    }
 }
 
 .game-container:fullscreen,
@@ -276,6 +332,7 @@ canvas {
 .game-container:fullscreen h1 {
     display: none;
 }
+
 .game-container:fullscreen canvas,
 .game-container:-webkit-full-screen canvas {
     width: 100vw;
