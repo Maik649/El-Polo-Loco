@@ -10,6 +10,7 @@ let backToStartButton;
 let gameStarted = false;
 let gameOver = false;
 let musicMuted = false;
+const MUSIC_MUTED_STORAGE_KEY = "elpolo.musicMuted";
 let gameAudio = null;
 let gameOverAudio = null;
 let winAudio = null;
@@ -31,6 +32,7 @@ function init() {
   initGameOverAudio();
   initWinAudio();
   initNoBottlesAudio();
+  loadMusicMutedState();
   showStartScreen();
   screenManager.checkOrientation();
   initMobileControls();
@@ -238,6 +240,24 @@ function stopAudio(audio) {
   audio.currentTime = 0;
 }
 
+function loadMusicMutedState() {
+  try {
+    const savedMusicMutedState = localStorage.getItem(MUSIC_MUTED_STORAGE_KEY);
+    if (savedMusicMutedState === null) {return;}
+    musicMuted = savedMusicMutedState === "true";
+  } catch (error) {
+    console.warn("Unable to read music state from localStorage:", error);
+  }
+}
+
+function saveMusicMutedState() {
+  try {
+    localStorage.setItem(MUSIC_MUTED_STORAGE_KEY, String(musicMuted));
+  } catch (error) {
+    console.warn("Unable to save music state in localStorage:", error);
+  }
+}
+
 /**
  * Starts a new game world and updates UI/audio state.
  * @returns {void}
@@ -276,6 +296,7 @@ function refreshSpeakerIcon() {
  */
 function toggleMusic() {
   musicMuted = !musicMuted;
+  saveMusicMutedState();
   if (musicMuted) {
    setSounds();
   } else {
@@ -290,7 +311,8 @@ function toggleMusic() {
   refreshSpeakerIcon();
 }
 
- function setSounds(){
+function setSounds() {
+   
    if (gameAudio) {gameAudio.pause();}
     if (gameOverAudio) {gameOverAudio.pause();}
     if (winAudio) {winAudio.pause();}
@@ -346,7 +368,10 @@ function showNoBottlesScreen() {
   updateBackToStartButtonVisibility();
   screenManager.showResultScreen( "./assets/img/You won, you lost/You lost.png", musicMuted,);
 }
-
+/**
+ * Kay Code from input 
+ * @returns {boolean}
+ */
 window.addEventListener("keydown", (e) => {
 
   if (e.keyCode === 37) {kayboard.LEFT = true;}
