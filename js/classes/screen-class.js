@@ -26,9 +26,7 @@ class GameScreen {
   }
 
   updateIconPositions() {
-    if (!this.canvas) {
-      return;
-    }
+    if (!this.canvas) {return;}
 
     this.fullscreenIcon.x = this.canvas.width - this.fullscreenIcon.width - 20;
     this.fullscreenIcon.y = 35;
@@ -40,51 +38,33 @@ class GameScreen {
    * Handles click actions for menu and result screens.
    * @param {MouseEvent} event Browser click event.
    * @param {{gameStarted: boolean, gameOver: boolean}} state Current game state.
-   * @param {{startGame: Function, restartGame: Function, toggleMusic: Function}} callbacks Action callbacks.
+    * @param {{startGame: Function, restartGame: Function, toggleMusic: Function, toggleFullscreen: Function}} callbacks Action callbacks.
    * @returns {void}
    */
   handleCanvasClick(event, state, callbacks) {
     const clickPosition = this.getCanvasClickPosition(event);
 
-    if (
-      !state.gameStarted &&
-      !state.gameOver &&
-      this.isInsideRect(clickPosition, this.impressumButton)
-    ) {
+    if (!state.gameStarted &&!state.gameOver && this.isInsideRect(clickPosition, this.impressumButton)) {
       window.location.href = "./impressum.html";
       return;
     }
 
-    if (
-      (state.gameOver || (!state.gameStarted && !state.gameOver)) &&
-      this.isInsideRect(clickPosition, this.speakerIcon)
-    ) {
+    if ((state.gameOver || (!state.gameStarted && !state.gameOver)) && this.isInsideRect(clickPosition, this.speakerIcon)) {
       callbacks.toggleMusic();
       return;
     }
 
-    if (
-      !state.gameStarted &&
-      !state.gameOver &&
-      this.isInsideRect(clickPosition, this.fullscreenIcon)
-    ) {
-      this.toggleFullscreen();
+    if ( !state.gameStarted && !state.gameOver && this.isInsideRect(clickPosition, this.fullscreenIcon)) {
+      callbacks.toggleFullscreen();
       return;
     }
 
-    if (
-      !state.gameStarted &&
-      !state.gameOver &&
-      this.isInsideRect(clickPosition, this.startButton)
-    ) {
+    if ( !state.gameStarted && !state.gameOver && this.isInsideRect(clickPosition, this.startButton)) {
       callbacks.startGame();
       return;
     }
 
-    if (
-      state.gameOver &&
-      this.isInsideRect(clickPosition, this.restartButton)
-    ) {
+    if (state.gameOver &&this.isInsideRect(clickPosition, this.restartButton)) {
       callbacks.restartGame();
     }
   }
@@ -181,14 +161,11 @@ class GameScreen {
    * @returns {void}
    */
   showStartScreen(musicMuted, onLoaded) {
-    this.renderImageScreen(
-      "./assets/img/9_intro_outro_screens/start/startscreen_1.png",
-      () => {
+    this.renderImageScreen( "./assets/img/9_intro_outro_screens/start/startscreen_1.png", () => {
         this.drawImpressumButton();
         this.drawStartButton();
         this.drawFullscreenIcon();
         this.drawSpeakerIcon(musicMuted);
-
         if (typeof onLoaded === "function") {
           onLoaded();
         }
@@ -309,13 +286,7 @@ class GameScreen {
     const speakerBodyH = 12;
 
     this.ctx.fillStyle = "#7c7b7b";
-    this.ctx.fillRect(
-      speakerLeft,
-      centerY - speakerBodyH / 2,
-      speakerBodyW,
-      speakerBodyH,
-    );
-
+    this.ctx.fillRect( speakerLeft,centerY - speakerBodyH / 2,speakerBodyW,speakerBodyH,);
     this.ctx.beginPath();
     this.ctx.moveTo(speakerLeft + speakerBodyW, centerY - 6);
     this.ctx.lineTo(speakerLeft + speakerBodyW + 8, centerY - 10);
@@ -425,78 +396,5 @@ class GameScreen {
     this.ctx.quadraticCurveTo(x, y, x + radius, y);
     this.ctx.closePath();
     this.ctx.fill();
-  }
-  /**
-   * Check mobile
-   * @returns
-   */
-  checkOrientation() {
-    const overlay = document.getElementById("orientationOverlay");
-    const isTouchDevice = this.isTouchDevice();
-    const isLandscape = window.matchMedia("(orientation: landscape)").matches;
-
-    if (!overlay) {return;}
-
-    overlay.style.display = isTouchDevice && !isLandscape ? "flex" : "none";
-
-    if (isTouchDevice && isLandscape) {
-      this.requestFullscreen();
-    }
-  }
-
-  /**
-   * Detects if the current device is touch-first.
-   * @returns {boolean}
-   */
-  isTouchDevice() {
-    return (
-      window.matchMedia("(pointer: coarse)").matches ||
-      navigator.maxTouchPoints > 0
-    );
-  }
-
-  /**
-   * Toggles fullscreen mode for the game container.
-   * @returns {void}
-   */
-  toggleFullscreen() {
-    if (!document.fullscreenElement) {
-      this.requestFullscreen();
-      return;
-    }
-
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-      document.msExitFullscreen();
-    }
-  }
-  /**
-   * Toggles fullscreen mode for the game container.
-   * @returns {void}
-   */
-  requestFullscreen() {
-    const elem = document.getElementById("gameContainer");
-    if (!elem) { return;}
-
-    if (document.fullscreenElement) {
-      return;
-    }
-
-    let requestResult;
-
-    if (elem.requestFullscreen) {
-      requestResult = elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) {
-      requestResult = elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) {
-      requestResult = elem.msRequestFullscreen();
-    }
-
-    if (requestResult && typeof requestResult.catch === "function") {
-      requestResult.catch(() => {});
-    }
   }
 }

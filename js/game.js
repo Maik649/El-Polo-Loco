@@ -9,6 +9,7 @@ let screenManager;
 let backToStartButton;
 let nochmalButton;
 let soundManager;
+let mobileScreen;
 let gameStarted = false;
 let gameOver = false;
 let musicMuted = false;
@@ -28,8 +29,8 @@ function init() {
   initManagers();
   initSound();
   showStartScreen();
-  screenManager.checkOrientation();
-  initMobileControls();
+  initMobileScreen();
+  mobileScreen.checkOrientation();
   initBackToStartButton();
   initNochmalButton();
   initEventListeners();
@@ -42,6 +43,15 @@ function initManagers() {
   soundManager = new SoundManager(MUSIC_MUTED_STORAGE_KEY);
   screenManager = new GameScreen();
   screenManager.setCanvas(canvas, ctx);
+}
+
+/**
+ * Initializes the mobile touch/orientation controller.
+ * @returns {void}
+ */
+function initMobileScreen() {
+  mobileScreen = new MobilScreen(kayboard, resetKeyboardState);
+  mobileScreen.init();
 }
 /**
  * Initializes audio, loads mute state and registers unlock callback.
@@ -146,7 +156,12 @@ function handleCanvasClick(event) {
   screenManager.handleCanvasClick(
     event,
     { gameStarted, gameOver },
-    { startGame, restartGame, toggleMusic },
+    {
+      startGame,
+      restartGame,
+      toggleMusic,
+      toggleFullscreen: () => mobileScreen.toggleFullscreen(),
+    },
   );
 }
 /**
@@ -170,61 +185,7 @@ function handleCanvasMouseLeave() {
  */
 function handleResize() {
   screenManager.updateIconPositions();
-  screenManager.checkOrientation();
-}
-/**
- * Binds a control button to press/release callbacks.
- * @param {string} buttonId Target button id.
- * @param {Function} onPress Callback on press.
- * @param {Function} onRelease Callback on release.
- * @returns {void}
- */
-function bindControlButton(buttonId, onPress, onRelease) {
-  const button = document.getElementById(buttonId);
-  if (!button) return;
-  const start = (event) => {
-    event.preventDefault();
-    onPress();
-  };
-  const end = (event) => {
-    event.preventDefault();
-    onRelease();
-  };
-
-  // Prefer pointer events to support modern mobile browsers consistently.
-  if (window.PointerEvent) {
-    button.addEventListener("pointerdown", start);
-    button.addEventListener("pointerup", end);
-    button.addEventListener("pointercancel", end);
-    button.addEventListener("pointerleave", end);
-  } else {
-    button.addEventListener("touchstart", start, { passive: false });
-    button.addEventListener("touchend", end, { passive: false });
-    button.addEventListener("touchcancel", end, { passive: false });
-    button.addEventListener("mousedown", start);
-    button.addEventListener("mouseup", end);
-    button.addEventListener("mouseleave", end);
-  }
-
-  button.addEventListener("contextmenu", (event) => event.preventDefault());
-}
-/**
- * Initializes touch/mouse bindings for mobile control buttons.
- * @returns {void}
- */
-function initMobileControls() {
-  const isTouchDevice = screenManager.isTouchDevice();
-  document.body.classList.toggle("touch-device", isTouchDevice);
-
-  if (!isTouchDevice) {return;}
-
-  bindControlButton("btn-left",() => (kayboard.LEFT = true),() => (kayboard.LEFT = false),);
-  bindControlButton("btn-right",() => (kayboard.RIGHT = true),() => (kayboard.RIGHT = false),);
-  bindControlButton("btn-jump",() => (kayboard.SPACE = true),() => (kayboard.SPACE = false),);
-  bindControlButton("btn-throw",() => (kayboard.D = true),() => (kayboard.D = false),);
-
-  // Ensure controls are released if the app loses focus while a button is held.
-  window.addEventListener("blur", resetKeyboardState);
+  mobileScreen.checkOrientation();
 }
 /**
  * Starts a new game world and updates UI/audio state.
@@ -236,7 +197,7 @@ function startGame() {
   gameWon = false;
   noBottlesLost = false;
   world = new World(canvas, kayboard, soundManager);
-  screenManager.checkOrientation();
+  mobileScreen.checkOrientation();
   soundManager.stopTracks(["gameOver", "win", "noBottles"]);
   soundManager.playGame();
   updateBackToStartButtonVisibility();
