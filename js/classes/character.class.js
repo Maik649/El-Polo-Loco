@@ -2,13 +2,13 @@
  * Main playable character class.
  * Handles movement input, animation state and idle/long-idle transitions.
  */
-class Character extends MovableObject {
+class Character extends MovableObject{
   x = 100;
   y = 170;
   widht = 100;
   height = 250;
   offset = { top: 60, bottom: 10, left: 25, right: 25 };
-  workingAudio = new Audio("./assets/audios/freesound_community-running-1-6846.mp3",);
+  workingAudio = new Audio( "./assets/audios/freesound_community-running-1-6846.mp3",);
 
   IDELIMAGE = [
     "./assets/img/2_character_pepe/1_idle/idle/I-1.png",
@@ -98,26 +98,19 @@ class Character extends MovableObject {
       this.workingAudio.pause();
       this.isWork();
 
-      if (this.world.kayboard.SPACE && !this.isAboveGound()) {this.jump();}
+      if (this.world.kayboard.SPACE && !this.isAboveGound()) {
+        this.jump();
+      }
       this.world.camara_x = -this.x + 100;
     }, 1000 / 60);
-
-    setInterval(() => {
-      const isMoving = this.world.kayboard.LEFT || this.world.kayboard.RIGHT;
-      const isAction = this.world.kayboard.SPACE;
-      const isInAir = this.isAboveGound();
-      const isHurtOrDead = this.isHurt() || this.isDead();
-
-      if (isMoving || isAction || isInAir || isHurtOrDead) { this.currentClock = 0;return;}
-
-      if (this.currentClock < 30) {
-        this.playAnimation(this.IDELIMAGE);
-        this.currentClock++;
-      } else {
-        this.playAnimation(this.LONGIDELIMAGE);
-      }
-    }, 250);
-
+    this.kayboardCheck();
+    this.setAnimationenCheck();
+  }
+  /**
+   * Checks if the Input can play.
+   * @returns {boolean}
+   */
+  setAnimationenCheck() {
     setInterval(() => {
       if (this.isDead()) {
         this.playAnimation(this.DEATIMAGE);
@@ -126,9 +119,34 @@ class Character extends MovableObject {
       } else if (this.isAboveGound()) {
         this.playAnimation(this.JUMPIMAGE);
       } else {
-        if (this.world.kayboard.LEFT || this.world.kayboard.RIGHT) {this.playAnimation(this.WORKIMAGE);}
+        if (this.world.kayboard.LEFT || this.world.kayboard.RIGHT) {
+          this.playAnimation(this.WORKIMAGE);
+        }
       }
-    }, 150);
+    }, 100);
+  }
+  /**
+   * Checks if the Input can play.
+   * @returns {boolean}
+   */
+  kayboardCheck() {
+    setInterval(() => {
+      const isMoving = this.world.kayboard.LEFT || this.world.kayboard.RIGHT;
+      const isAction = this.world.kayboard.SPACE;
+      const isInAir = this.isAboveGound();
+      const isHurtOrDead = this.isHurt() || this.isDead();
+
+      if (isMoving || isAction || isInAir || isHurtOrDead) {
+        this.currentClock = 0; return;
+      }
+
+      if (this.currentClock < 30) {
+        this.playAnimation(this.IDELIMAGE);
+        this.currentClock++;
+      } else {
+        this.playAnimation(this.LONGIDELIMAGE);
+      }
+    }, 250);
   }
 
   /**
@@ -145,10 +163,14 @@ class Character extends MovableObject {
   /**
    * @returns {boolean} True when long-idle animation should be active.
    */
-  isInLongIdleMode() { return this.canBeIdle() && this.currentClock >= 30;}
+  isInLongIdleMode() {
+    return this.canBeIdle() && this.currentClock >= 30;
+  }
 
   /**
    * @returns {boolean} True when normal idle animation should be active.
    */
-  isInIdleMode() {return this.canBeIdle() && this.currentClock < 30;}
+  isInIdleMode() {
+    return this.canBeIdle() && this.currentClock < 30;
+  }
 }
