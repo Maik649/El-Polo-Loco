@@ -7,16 +7,13 @@ let world;
 let kayboard = new Kayboard();
 let screenManager;
 let backToStartButton;
+let soundManager;
 let gameStarted = false;
 let gameOver = false;
 let musicMuted = false;
 const MUSIC_MUTED_STORAGE_KEY = "elpolo.musicMuted";
-let gameAudio = null;
-let gameOverAudio = null;
-let winAudio = null;
 let gameWon = false;
 let noBottlesLost = false;
-let noBottlesAudio = null;
 
 /**
  * Initializes canvas, screen manager, controls and event listeners.
@@ -26,13 +23,16 @@ function init() {
   canvas = document.getElementById("gameCanvas");
   ctx = canvas.getContext("2d");
   backToStartButton = document.getElementById("backToStartBtn");
+  soundManager = new SoundManager(MUSIC_MUTED_STORAGE_KEY);
   screenManager = new GameScreen();
   screenManager.setCanvas(canvas, ctx);
-  initGameAudio();
-  initGameOverAudio();
-  initWinAudio();
-  initNoBottlesAudio();
-  loadMusicMutedState();
+  soundManager.init();
+  musicMuted = soundManager.loadMutedState();
+  soundManager.initUnlock(() => {
+    if (!musicMuted) {
+      playActiveSceneAudio();
+    }
+  });
   showStartScreen();
   screenManager.checkOrientation();
   initMobileControls();
@@ -44,16 +44,44 @@ function init() {
   window.addEventListener("resize", handleResize);
 }
 
+/**
+ * Plays the matching audio for the currently visible game scene.
+ * @returns {void}
+ */
+function playActiveSceneAudio() {
+  const scene = gameWon
+    ? "win"
+    : noBottlesLost
+      ? "noBottles"
+      : gameOver
+        ? "gameOver"
+        : "game";
+
+  soundManager.playScene(scene);
+}
+
+/**
+ * Wires the back-to-start button click handler.
+ * @returns {void}
+ */
 function initBackToStartButton() {
   if (!backToStartButton) {return;}
   backToStartButton.addEventListener("click", returnToStartScreen);
 }
 
+/**
+ * Toggles visibility for the back-to-start button depending on game state.
+ * @returns {void}
+ */
 function updateBackToStartButtonVisibility() {
   if (!backToStartButton) { return;}
   backToStartButton.style.display = gameStarted && !gameOver ? "block" : "none";
 }
 
+/**
+ * Stops the current world loop and clears the world reference.
+ * @returns {void}
+ */
 function stopWorldIfRunning() {
   if (!world) {return;}
 
@@ -61,6 +89,10 @@ function stopWorldIfRunning() {
   world = null;
 }
 
+/**
+ * Resets all keyboard flags to their default unpressed state.
+ * @returns {void}
+ */
 function resetKeyboardState() {
   kayboard.LEFT = false;
   kayboard.RIGHT = false;
@@ -81,9 +113,7 @@ function returnToStartScreen() {
   noBottlesLost = false;
   stopWorldIfRunning();
   resetKeyboardState();
-  stopAudio(gameOverAudio);
-  stopAudio(winAudio);
-  stopAudio(noBottlesAudio);
+  soundManager.stopTracks(["gameOver", "win", "noBottles"]);
   showStartScreen();
 }
 
@@ -100,14 +130,27 @@ function handleCanvasClick(event) {
   );
 }
 
+/**
+ * Delegates canvas hover handling to the screen manager.
+ * @param {MouseEvent} event Browser mouse move event.
+ * @returns {void}
+ */
 function handleCanvasMouseMove(event) {
   screenManager.handleCanvasMouseMove(event, { gameStarted, gameOver });
 }
 
+/**
+ * Restores default cursor when the pointer leaves the canvas.
+ * @returns {void}
+ */
 function handleCanvasMouseLeave() {
   screenManager.resetCanvasCursor();
 }
 
+/**
+ * Updates responsive canvas UI state on window resize.
+ * @returns {void}
+ */
 function handleResize() {
   screenManager.updateIconPositions();
   screenManager.checkOrientation();
@@ -142,120 +185,15 @@ function bindControlButton(buttonId, onPress, onRelease) {
   button.addEventListener("mouseleave", end);
 }
 
+/**
+ * Initializes touch/mouse bindings for mobile control buttons.
+ * @returns {void}
+ */
 function initMobileControls() {
   bindControlButton("btn-left",() => (kayboard.LEFT = true),() => (kayboard.LEFT = false),);
   bindControlButton("btn-right",() => (kayboard.RIGHT = true),() => (kayboard.RIGHT = false),);
   bindControlButton("btn-jump",() => (kayboard.SPACE = true),() => (kayboard.SPACE = false),);
   bindControlButton("btn-throw",() => (kayboard.D = true),() => (kayboard.D = false),);
-}
-
-function initGameAudio() {
-  if (gameAudio) {return;}
-
-  gameAudio = new Audio("./assets/audios/mixkit-game-level-music-689.wav");
-  gameAudio.loop = true;
-  gameAudio.volume = 0.25;
-  gameAudio.preload = "auto";
-}
-
-function initGameOverAudio() {
-  if (gameOverAudio) {return;}
-
-  gameOverAudio = new Audio("./assets/audios/universfield-game-over-deep-male-voice-clip-352695.mp3");
-  gameOverAudio.volume = 0.25;
-  gameOverAudio.preload = "auto";
-}
-
-function initWinAudio() {
-  if (winAudio) {return;}
-
-  winAudio = new Audio("./assets/audios/we-ve-got-a-winner-carnival-speaker-voice-dan-barracuda-1-00-02.mp3");
-  winAudio.volume = 0.25;
-  winAudio.preload = "auto";
-}
-
-function initNoBottlesAudio() {
-  if (noBottlesAudio) {return;}
-
-  noBottlesAudio = new Audio("./assets/audios/fail-male-taunt-wah-wah-wah-trumpet-gfx-sounds-1-00-04.mp3");
-  noBottlesAudio.volume = 0.25;
-  noBottlesAudio.preload = "auto";
-}
-
-function tryPlayGameAudio() {
-  if (!gameAudio || musicMuted) { return;}
-
-  const playPromise = gameAudio.play();
-  if (playPromise && typeof playPromise.catch === "function") {
-    playPromise.catch((error) => {
-      console.warn("Audio playback blocked or failed:", error);
-    });
-  }
-}
-
-function tryPlayGameOverAudio() {
-  if (!gameOverAudio || musicMuted) { return;}
-
-  gameOverAudio.currentTime = 0;
-  const playPromise = gameOverAudio.play();
-  if (playPromise && typeof playPromise.catch === "function") {
-    playPromise.catch((error) => {
-      console.warn("Game-over audio playback blocked or failed:", error);
-    });
-  }
-}
-
-function tryPlayWinAudio() {
-  if (!winAudio || musicMuted) {return;}
-
-  winAudio.currentTime = 0;
-  const playPromise = winAudio.play();
-  if (playPromise && typeof playPromise.catch === "function") {
-    playPromise.catch((error) => {
-      console.warn("Win audio playback blocked or failed:", error);
-    });
-  }
-}
-
-function tryPlayNoBottlesAudio() {
-  if (!noBottlesAudio || musicMuted) { return;}
-
-  noBottlesAudio.currentTime = 0;
-  const playPromise = noBottlesAudio.play();
-  if (playPromise && typeof playPromise.catch === "function") {
-    playPromise.catch((error) => {
-      console.warn("No-bottles audio playback blocked or failed:", error);
-    });
-  }
-}
-
-/**
- * Stops and resets an audio instance.
- * @param {HTMLAudioElement|null} audio Audio element.
- * @returns {void}
- */
-function stopAudio(audio) {
-  if (!audio) {return;}
-  audio.pause();
-  audio.currentTime = 0;
-}
-
-function loadMusicMutedState() {
-  try {
-    const savedMusicMutedState = localStorage.getItem(MUSIC_MUTED_STORAGE_KEY);
-    if (savedMusicMutedState === null) {return;}
-    musicMuted = savedMusicMutedState === "true";
-  } catch (error) {
-    console.warn("Unable to read music state from localStorage:", error);
-  }
-}
-
-function saveMusicMutedState() {
-  try {
-    localStorage.setItem(MUSIC_MUTED_STORAGE_KEY, String(musicMuted));
-  } catch (error) {
-    console.warn("Unable to save music state in localStorage:", error);
-  }
 }
 
 /**
@@ -268,57 +206,50 @@ function startGame() {
   gameWon = false;
   noBottlesLost = false;
   world = new World(canvas, kayboard);
-  stopAudio(gameOverAudio);
-  stopAudio(winAudio);
-  stopAudio(noBottlesAudio);
-  tryPlayGameAudio();
+  soundManager.stopTracks(["gameOver", "win", "noBottles"]);
+  soundManager.playGame();
   updateBackToStartButtonVisibility();
 }
 
+/**
+ * Restarts the flow by returning to the start screen.
+ * @returns {void}
+ */
 function restartGame() {
   returnToStartScreen();
 }
 
+/**
+ * Renders the start screen and applies current mute state.
+ * @returns {void}
+ */
 function showStartScreen() {
   updateBackToStartButtonVisibility();
-  screenManager.showStartScreen(musicMuted, () => {tryPlayGameAudio();});
+  screenManager.showStartScreen(musicMuted, () => {soundManager.playGame();});
 }
 
+/**
+ * Redraws the speaker icon with the current mute state.
+ * @returns {void}
+ */
 function refreshSpeakerIcon() {
   if (!screenManager) {return;}
 
   screenManager.refreshSpeakerIcon(musicMuted);
 }
-
 /**
  * Toggles mute state and refreshes currently active audio.
  * @returns {void}
  */
 function toggleMusic() {
-  musicMuted = !musicMuted;
-  saveMusicMutedState();
+  musicMuted = soundManager.toggleMute();
   if (musicMuted) {
-   setSounds();
+    soundManager.pauseAll();
   } else {
-    if (gameWon) {
-      tryPlayWinAudio();
-    } else if (noBottlesLost) {
-      tryPlayNoBottlesAudio();
-    } else if (gameOver) {
-      tryPlayGameOverAudio();
-    } else { tryPlayGameAudio();}
+    playActiveSceneAudio();
   }
   refreshSpeakerIcon();
 }
-
-function setSounds() {
-   
-   if (gameAudio) {gameAudio.pause();}
-    if (gameOverAudio) {gameOverAudio.pause();}
-    if (winAudio) {winAudio.pause();}
-    if (noBottlesAudio) { noBottlesAudio.pause();}
-}
-
 /**
  * Shows win result screen.
  * @returns {void}
@@ -328,14 +259,12 @@ function showWinScreen() {
   gameOver = true;
   gameWon = true;
   noBottlesLost = false;
-  gameAudio.pause();
-  stopAudio(gameOverAudio);
-  stopAudio(noBottlesAudio);
-  tryPlayWinAudio();
+  soundManager.stopTrack("game", false);
+  soundManager.stopTracks(["gameOver", "noBottles"]);
+  soundManager.playWin();
   updateBackToStartButtonVisibility();
   screenManager.showResultScreen( "./assets/img/You won, you lost/You Win A.png",musicMuted,);
 }
-
 /**
  * Shows game-over result screen.
  * @returns {void}
@@ -345,13 +274,12 @@ function showGameOverScreen() {
   gameOver = true;
   gameWon = false;
   noBottlesLost = false;
-  gameAudio.pause();
-  stopAudio(noBottlesAudio);
-  tryPlayGameOverAudio();
+  soundManager.stopTrack("game", false);
+  soundManager.stopTracks(["noBottles"]);
+  soundManager.playGameOver();
   updateBackToStartButtonVisibility();
   screenManager.showResultScreen( "./assets/img/9_intro_outro_screens/game_over/game over.png", musicMuted,);
 }
-
 /**
  * Shows lose screen when no bottles are left and endboss survives.
  * @returns {void}
@@ -361,16 +289,17 @@ function showNoBottlesScreen() {
   gameOver = true;
   gameWon = false;
   noBottlesLost = true;
-  gameAudio.pause();
-  stopAudio(gameOverAudio);
-  stopAudio(winAudio);
-  tryPlayNoBottlesAudio();
+  soundManager.stopTrack("game", false);
+  soundManager.stopTracks(["gameOver", "win"]);
+  soundManager.playNoBottles();
   updateBackToStartButtonVisibility();
   screenManager.showResultScreen( "./assets/img/You won, you lost/You lost.png", musicMuted,);
 }
+
 /**
- * Kay Code from input 
- * @returns {boolean}
+ * Updates keyboard state on keydown input.
+ * @param {KeyboardEvent} e Keyboard event.
+ * @returns {void}
  */
 window.addEventListener("keydown", (e) => {
 
@@ -382,6 +311,11 @@ window.addEventListener("keydown", (e) => {
   if (e.keyCode === 68) {kayboard.D = true;}
 });
 
+/**
+ * Updates keyboard state on keyup input.
+ * @param {KeyboardEvent} e Keyboard event.
+ * @returns {void}
+ */
 window.addEventListener("keyup", (e) => {
   if (e.keyCode === 37) {kayboard.LEFT = false;}
   if (e.keyCode === 39) {kayboard.RIGHT = false;}
