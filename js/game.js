@@ -166,17 +166,8 @@ function handleResize() {
 function bindControlButton(buttonId, onPress, onRelease) {
   const button = document.getElementById(buttonId);
   if (!button) return;
-
-  const start = (event) => {
-    event.preventDefault();
-    onPress();
-  };
-
-  const end = (event) => {
-    event.preventDefault();
-    onRelease();
-  };
-
+  const start = (event) => { event.preventDefault(); onPress();};
+  const end = (event) => { event.preventDefault(); onRelease();};
   button.addEventListener("touchstart", start);
   button.addEventListener("touchend", end);
   button.addEventListener("touchcancel", end);
