@@ -8,7 +8,6 @@ class Character extends MovableObject{
   widht = 100;
   height = 250;
   offset = { top: 60, bottom: 10, left: 25, right: 25 };
-  workingAudio = new Audio( "./assets/audios/freesound_community-running-1-6846.mp3",);
 
   IDELIMAGE = [
     "./assets/img/2_character_pepe/1_idle/idle/I-1.png",
@@ -98,14 +97,13 @@ class Character extends MovableObject{
   animation() {
     setInterval(() => {
       if (!this.world || this.world.gameOver) {
-        this.workingAudio.pause();
         return;
       }
 
-      this.workingAudio.pause();
       this.isWork();
 
       if (this.world.kayboard.SPACE && !this.isAboveGound()) {
+        this.world.soundManager?.playJump();
         this.jump();
       }
       this.world.camara_x = -this.x + 100;
@@ -190,6 +188,14 @@ class Character extends MovableObject{
   }
 
   /**
+   * Resets the idle timer so the character returns to normal idle mode.
+   * @returns {void}
+   */
+  resetIdleMode() {
+    this.currentClock = 0;
+  }
+
+  /**
    * Plays jump animation once per jump with dedicated frame tracking.
    * @returns {void}
    */
@@ -207,4 +213,5 @@ class Character extends MovableObject{
       this.jumpFrameIndex++;
     }
   }
+
 }

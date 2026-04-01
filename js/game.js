@@ -157,6 +157,7 @@ function positionOverlayButtons() {
 function stopWorldIfRunning() {
   if (!world) {return;}
 
+  soundManager.stopGameplaySounds();
   world.gameOver = true;
   world = null;
 }
@@ -295,9 +296,6 @@ function toggleMusic() {
   musicMuted = soundManager.toggleMute();
   if (musicMuted) {
     soundManager.pauseAll();
-    if (world?.character?.workingAudio) {
-      world.character.workingAudio.pause();
-    }
   } else {
     playActiveSceneAudio();
   }
@@ -315,6 +313,7 @@ function showWinScreen() {
   noBottlesLost = false;
   resetKeyboardState();
   if (world) {world.gameOver = true;}
+  soundManager.stopGameplaySounds();
   soundManager.stopTrack("game", false);
   soundManager.stopTracks(["gameOver", "noBottles"]);
   soundManager.playWin();
@@ -333,6 +332,7 @@ function showGameOverScreen() {
   noBottlesLost = false;
   resetKeyboardState();
   if (world) {world.gameOver = true;}
+  soundManager.stopGameplaySounds();
   soundManager.stopTrack("game", false);
   soundManager.stopTracks(["noBottles"]);
   soundManager.playGameOver();
@@ -351,6 +351,7 @@ function showNoBottlesScreen() {
   noBottlesLost = true;
   resetKeyboardState();
   if (world) {world.gameOver = true;}
+  soundManager.stopGameplaySounds();
   soundManager.stopTrack("game", false);
   soundManager.stopTracks(["gameOver", "win"]);
   soundManager.playNoBottles();

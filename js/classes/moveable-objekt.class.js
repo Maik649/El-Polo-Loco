@@ -30,23 +30,27 @@ class MovableObject extends DrawableObjekt {
    * @returns {void}
    */
   isWork() {
-    const canPlayWorkingSound = this.workingAudio && (!this.world?.soundManager || !this.world.soundManager.isMuted());
+    const soundManager = this.world?.soundManager;
+    let isMoving = false;
 
     if (this.world.kayboard.LEFT && this.x > 100) {
       this.moveLeft();
       this.otherDirection = true;
-      if (canPlayWorkingSound) {
-        this.workingAudio.play();
-      }
+      isMoving = true;
     };
 
     if (this.world.kayboard.RIGHT && this.x < this.world.level.level_end_x) {
       this.moveRight();
       this.otherDirection = false;
-      if (canPlayWorkingSound) {
-        this.workingAudio.play();
-      }
+      isMoving = true;
     };
+
+    if (isMoving) {
+      soundManager?.playRun();
+      return;
+    }
+
+    soundManager?.stopRun();
   };
 
   /**

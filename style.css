@@ -149,7 +149,7 @@ body.touch-device .mobile-controls { display: flex;}
     font-size: 1.2rem;
 }
 
-@media (min-width: 1440px) and (max-width: 1920px) {
+@media (min-width: 1440px) and (max-width: 1920px) and (pointer: coarse){
     .mobile-controls {  display: none;}
 
     .game-container {
@@ -204,7 +204,7 @@ body.touch-device .mobile-controls { display: flex;}
     .nochmal-btn:hover {background: rgba(187, 186, 185, 0.92);}
 }
 
-@media only screen and (max-width: 1440px) {
+@media only screen and (max-width: 1440px) and (pointer: coarse){
     canvas {
         height: 100vh;
         width: 100vw;
@@ -282,9 +282,8 @@ body.touch-device .mobile-controls { display: flex;}
     }
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 768px)and (pointer: coarse) {
     canvas {
-        height: 95vh;
         width: 100vw;
     }
 
@@ -336,7 +335,7 @@ body.touch-device .mobile-controls { display: flex;}
     }
 }
 
-@media only screen and (max-width: 480px) {
+@media only screen and (max-width: 480px) and (pointer: coarse) {
     canvas {
         height: 100vh;
         width: 100vw;

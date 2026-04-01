@@ -99,9 +99,7 @@ class World {
   /**
    * Set Character to World
    */
-  setWorld() {
-    this.character.world = this;
-  }
+  setWorld() { this.character.world = this;}
 
   /**
    * Runs per-frame world updates.
@@ -137,9 +135,7 @@ class World {
    *  Bottel flight check
    * @returns {void}
    */
-  hasThrowableBottleInFlight() {
-    return this.throwableobjekts.some((bottle) => !bottle.broken);
-  }
+  hasThrowableBottleInFlight() { return this.throwableobjekts.some((bottle) => !bottle.broken);}
 
   /**
    * Throws a bottle if throw key is active and conditions are met.
@@ -150,9 +146,15 @@ class World {
       const offsetX = this.character.otherDirection ? -50 : 50;
       const startX = this.character.x + offsetX;
       const startY = this.character.y + 50;
-      const bottle = new ThrowableObjekts(startX,startY, this.character.otherDirection,);
+      const bottle = new ThrowableObjekts(
+        startX,
+        startY,
+        this.character.otherDirection,
+        () => { this.soundManager?.playBottleBreak(); },
+      );
       this.throwableobjekts.push(bottle);
       this.bottlesCollected--;
+      this.character.resetIdleMode();
       const percentage = Math.min(this.bottlesCollected * 20, 100);
       this.statusBarBottle.setPercentageBottel(percentage);
       this.kayboard.D = false;
@@ -184,6 +186,7 @@ class World {
       this.bottlesCollected++;
       const percentage = Math.min(this.bottlesCollected * 20, 100);
       this.statusBarBottle.setPercentageBottel(percentage);
+      this.soundManager?.playBottleCollect();
     }
   }
 
@@ -199,6 +202,7 @@ class World {
       this.coinsCollected++;
       const percentage =this.totalCoins > 0 ? Math.min((this.coinsCollected / this.totalCoins) * 100, 100): 0;
       this.statusBarCoins.setPercentageBottel(percentage);
+      this.soundManager?.playCoinCollect();
     }
   }
 
@@ -222,7 +226,9 @@ class World {
 
     if (chickenEnemy && enemy.dead) {return;}
     if (chickenEnemy && this.isStompFromTop(enemy)) {
-      enemy.die(); return;
+      enemy.die();
+      this.soundManager?.playEnemyKill();
+      return;
     }
     this.handleCharacterHitByEnemy();
   }
@@ -241,16 +247,10 @@ class World {
    * @returns {boolean}
    */
   isStompFromTop(enemy) {
-    const characterBottom =
-      this.character.y +
-      this.character.height -
-      (this.character.offset?.bottom || 0);
+    const characterBottom =this.character.y + this.character.height - (this.character.offset?.bottom || 0);
     const enemyTop = enemy.y + (enemy.offset?.top || 0);
     const enemyEffHeight = enemy.height - (enemy.offset?.top || 0) - (enemy.offset?.bottom || 0);
-  return (
-      this.character.speedY < 0 &&
-      characterBottom <= enemyTop + enemyEffHeight / 2
-    );
+  return ( this.character.speedY < 0 && characterBottom <= enemyTop + enemyEffHeight / 2);
   }
 
   /**
@@ -260,14 +260,12 @@ class World {
   handleCharacterHitByEnemy() {
     if (this.character.isHurt()) {return; }
     this.character.hit();
+    this.character.resetIdleMode();
+    this.soundManager?.playCharacterHit();
     this.statusBarHealt.setPercentage(this.character.energy);
 
     setTimeout(() => {
-      if (
-        this.character.isDead() &&
-        !this.gameOver &&
-        typeof showGameOverScreen === "function"
-      ) {
+      if ( this.character.isDead() && !this.gameOver && typeof showGameOverScreen === "function") {
         this.gameOver = true;
         showGameOverScreen();
       }
@@ -295,14 +293,20 @@ class World {
    */
   handleSingleBottleHit(enemy, bottle, index) {
     enemy.hit(10);
+    if (enemy.isDead()) {
+      this.soundManager?.stopEndbossHit();
+    } else {
+      this.soundManager?.playEndbossHit();
+    }
     if (typeof enemy.startAttackMode === "function") { enemy.startAttackMode();}
     if (typeof bottle.breakBottle === "function") {
-      bottle.breakBottle();
+      bottle.breakBottle(true);
     } else {
       if (typeof bottle.dispose === "function") { bottle.dispose(); }
       this.throwableobjekts.splice(index, 1);
     }
     this.statusBarEndboss.setPercentage(enemy.energy);
+    if (enemy.isDead()) { this.soundManager?.playEnemyKill(); }
     this.triggerWinScreenIfNeeded(enemy);
   }
 
@@ -311,9 +315,7 @@ class World {
    * @returns {void}
    */
   triggerWinScreenIfNeeded(enemy) {
-    if (!enemy.isDead() ||this.gameOver ||typeof showWinScreen !== "function") {
-      return;
-    }
+    if (!enemy.isDead() ||this.gameOver ||typeof showWinScreen !== "function") { return;}
     setTimeout(() => {
       if (this.gameOver) {return;}
       this.gameOver = true;
@@ -360,9 +362,7 @@ class World {
    * @returns {void}
    */
   addObjekts(objekts) {
-    objekts.forEach((o) => {
-      this.addToMap(o);
-    });
+    objekts.forEach((o) => { this.addToMap(o);});
   }
 
   /**
@@ -370,15 +370,11 @@ class World {
    * @returns {void}
    */
   addToMap(mo) {
-    if (mo.otherDirection) {
-      this.flipImage(mo);
-    }
+    if (mo.otherDirection) {this.flipImage(mo);}
     mo.draws(this.ctx);
     mo.drawsFrame(this.ctx);
 
-    if (mo.otherDirection) {
-      this.flipImageBack(mo);
-    }
+    if (mo.otherDirection) { this.flipImageBack(mo);}
   }
 
   /**

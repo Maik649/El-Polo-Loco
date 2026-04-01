@@ -5,7 +5,7 @@ class Level {
   enemies;
   clouds;
   backrounds;
-  level_end_x = 1439;
+  level_end_x = 720*3;
   /**
    * @param {Array} enemies Enemy entities.
    * @param {Array} clouds Cloud entities.
