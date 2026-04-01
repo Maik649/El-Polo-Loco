@@ -6,7 +6,7 @@ class GameScreen {
     this.canvas = null;
     this.ctx = null;
     this.fullscreenImage = null;
-    this.impressumButton = { x: 20, y: 20, width: 130, height: 36 };
+    this.impressumButton = { x: 20, y: 20, width: 200, height: 60 };
     this.startButton = { x: 260, y: 350, width: 200, height: 60 };
     this.restartButton = { x: 260, y: 350, width: 200, height: 60 };
     this.fullscreenIcon = { x: 0, y: 0, width: 40, height: 40 };
@@ -203,7 +203,7 @@ class GameScreen {
   drawImpressumButton() {
     this.ctx.fillStyle = "rgba(122, 122, 122, 0.6)";
     this.drawRoundedRect(this.impressumButton.x, this.impressumButton.y, this.impressumButton.width,this.impressumButton.height,8);
-    this.ctx.fillStyle = "#fff7ef";
+    this.ctx.fillStyle = "#ffffef";
     this.ctx.font = "18px Arial";
     this.ctx.textAlign = "center";
     this.ctx.textBaseline = "middle";
