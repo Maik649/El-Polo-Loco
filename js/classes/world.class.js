@@ -95,12 +95,14 @@ class World {
     this.addObjekts(this.coins);
     this.addToMap(this.character);
   }
+  
   /**
    * Set Character to World
    */
   setWorld() {
     this.character.world = this;
   }
+
   /**
    * Runs per-frame world updates.
    * @returns {void}
@@ -113,6 +115,7 @@ class World {
     this.checkEndbossMovement();
     this.checkNoBottlesLose();
   }
+
   /**
    *  world updates Throwableobjekts.
    * @returns {void}
@@ -129,6 +132,7 @@ class World {
       }
     }
   }
+
   /**
    *  Bottel flight check
    * @returns {void}
@@ -136,12 +140,13 @@ class World {
   hasThrowableBottleInFlight() {
     return this.throwableobjekts.some((bottle) => !bottle.broken);
   }
+
   /**
    * Throws a bottle if throw key is active and conditions are met.
    * @returns {void}
    */
   checkThowableObjeks() {
-    if (this.kayboard.D && this.bottlesCollected > 0 && this.character.isInIdleMode() &&!this.hasThrowableBottleInFlight()) {
+    if (this.kayboard.D && this.bottlesCollected > 0 && this.character.canBeIdle() &&!this.hasThrowableBottleInFlight()) {
       const offsetX = this.character.otherDirection ? -50 : 50;
       const startX = this.character.x + offsetX;
       const startY = this.character.y + 50;
@@ -153,6 +158,7 @@ class World {
       this.kayboard.D = false;
     }
   }
+
   /**
    * Throws a bottle if throw key is active and conditions are met.
    * @returns {void}
@@ -163,6 +169,7 @@ class World {
     this.checkCoinCollection();
     this.handleBottleHitsOnEndboss();
   }
+
   /**
    * Check Bottle Collection .
    * @returns {void}
@@ -179,6 +186,7 @@ class World {
       this.statusBarBottle.setPercentageBottel(percentage);
     }
   }
+
   /**
    * check Cions Collection .
    * @returns {void}
@@ -193,6 +201,7 @@ class World {
       this.statusBarCoins.setPercentageBottel(percentage);
     }
   }
+
   /**
    * Handle Enemy Collisions .
    * @returns {void}
@@ -203,6 +212,7 @@ class World {
       this.handleCharacterEnemyCollision(enemy);
     });
   }
+
   /**
    * Handle Character Enemy Collision .
    * @returns {void}
@@ -216,6 +226,7 @@ class World {
     }
     this.handleCharacterHitByEnemy();
   }
+
   /**
    * @param {MovableObject} enemy Enemy instance.
    * @returns {boolean} True if enemy is a chicken variant.
@@ -223,6 +234,7 @@ class World {
   isChickenEnemy(enemy) {
     return enemy instanceof Chicken || enemy instanceof ChickenSmall;
   }
+
   /**
    * Checks if player is stomping the enemy from above.
    * @param {MovableObject} enemy Enemy instance.
@@ -240,6 +252,7 @@ class World {
       characterBottom <= enemyTop + enemyEffHeight / 2
     );
   }
+
   /**
    * Handle Character Hit By Enemy .
    * @returns {void}
@@ -260,18 +273,22 @@ class World {
       }
     }, 1000 / 60);
   }
+
   /**
    * Handle Bottle Hits On Endboss.
    * @returns {void}
    */
   handleBottleHitsOnEndboss() {
     this.throwableobjekts.forEach((bottle, index) => {
+      if (bottle.broken) { return; }
+
       this.level.enemies.forEach((enemy) => {
         if (!(enemy instanceof Endboss) || !bottle.isColliding(enemy)) { return;}
         this.handleSingleBottleHit(enemy, bottle, index);
       });
     });
   }
+
   /**
    * Handle Singel Hit By Enemy .
    * @returns {void}
@@ -279,11 +296,16 @@ class World {
   handleSingleBottleHit(enemy, bottle, index) {
     enemy.hit(10);
     if (typeof enemy.startAttackMode === "function") { enemy.startAttackMode();}
-    if (typeof bottle.dispose === "function") { bottle.dispose();}
-    this.throwableobjekts.splice(index, 1);
+    if (typeof bottle.breakBottle === "function") {
+      bottle.breakBottle();
+    } else {
+      if (typeof bottle.dispose === "function") { bottle.dispose(); }
+      this.throwableobjekts.splice(index, 1);
+    }
     this.statusBarEndboss.setPercentage(enemy.energy);
     this.triggerWinScreenIfNeeded(enemy);
   }
+
   /**
    * Win Screen .
    * @returns {void}
@@ -298,6 +320,7 @@ class World {
       showWinScreen();
     }, 2500);
   }
+
   /**
    * Check Endboss Movement
    * @returns {void}
@@ -311,6 +334,7 @@ class World {
       }
     });
   }
+
   /**
    * Check No Bottles Lose
    * @returns {void}
@@ -330,6 +354,7 @@ class World {
       }, 2500);
     }
   }
+
   /**
    * Add Objekts .
    * @returns {void}
@@ -339,6 +364,7 @@ class World {
       this.addToMap(o);
     });
   }
+
   /**
    * @param {MovableObject} mo Object to draw.
    * @returns {void}
@@ -354,6 +380,7 @@ class World {
       this.flipImageBack(mo);
     }
   }
+
   /**
    * Flip Image.
    * @returns {void}
@@ -364,6 +391,7 @@ class World {
     this.ctx.scale(-1, 1);
     mo.x = mo.x * -1;
   }
+
   /**
    * Handle Character Hit By Enemy .
    * @returns {void}

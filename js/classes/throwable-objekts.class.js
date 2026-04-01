@@ -33,7 +33,7 @@ class ThrowableObjekts extends MovableObject {
   trow(x, y, otherDirection) {
     this.x = x;
     this.y = y;
-    this.speedY = 25;
+    this.speedY = 33;
     this.otherDirection = otherDirection;
     this.applayGravity();
     this.throwInterval = setInterval(() => {

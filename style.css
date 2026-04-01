@@ -11,10 +11,10 @@ body {
     background-size: cover;
 }
 
-body.legal-page {
-    padding: 32px 16px;
+.legal-page {
+    display: flex;
     box-sizing: border-box;
-    justify-content: flex-start;
+    justify-content: center;
 }
 
 .legal-card {
@@ -79,50 +79,6 @@ button {
     position: relative;
 }
 
-.back-to-start-btn {
-    position: fixed;
-    top: calc(5px + 5px);
-    right: calc(50% - 150px);
-    z-index: 20;
-    height: calc(30px + 20px);
-    width: calc(250px + 50px);
-    border: none;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 26px;
-    font-weight: 700;
-    color: rgba(255, 253, 253, 0.822);
-    background: rgba(122, 122, 122, 0.6);
-    cursor: pointer;
-    display: none;
-}
-
-.back-to-start-btn:hover {
-    background: rgba(187, 186, 185, 0.92);
-}
-
-.nochmal-btn {
-    display: none;
-    position: fixed;
-    height: calc(30px + 20px);
-    width: calc(250px + 50px);
-    border-radius: 8px;
-    top: calc(5px + 5px);
-    right: calc(50% - 148px);
-    border: none;
-    padding: 8px 12px;
-    font-size: 32px;
-    font-weight: 700;
-    color: rgba(255, 253, 253, 0.822);
-    background: rgba(122, 122, 122, 0.6);
-    cursor: pointer;
-    z-index: 20;
-}
-
-.nochmal-btn:hover {
-    background: rgba(187, 186, 185, 0.92);
-}
-
 canvas {
     display: block;
     width: 100%;
@@ -142,6 +98,52 @@ canvas {
     gap: 16px;
     user-select: none;
     touch-action: manipulation;
+}
+
+.back-to-start-btn {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    height: calc(30px + 20px);
+    width: calc(250px - 50px);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 21px;
+    font-weight: 500;
+    color: rgba(255, 253, 253, 0.822);
+    background: rgba(122, 122, 122, 0.6);
+    cursor: pointer;
+    display: none;
+}
+
+.back-to-start-btn:hover {
+    background: rgba(187, 186, 185, 0.92);
+}
+
+.nochmal-btn {
+    display: none;
+    position: fixed;
+    height: calc(30px + 20px);
+    width: calc(150px + 50px);
+    border-radius: 8px;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: none;
+    padding: 8px 12px;
+    font-size: 21px;
+    font-weight: 500;
+    color: rgba(255, 253, 253, 0.822);
+    background: rgba(122, 122, 122, 0.6);
+    cursor: pointer;
+    z-index: 20;
+}
+
+.nochmal-btn:hover {
+    background: rgba(187, 186, 185, 0.92);
 }
 
 body.touch-device .mobile-controls {
@@ -199,7 +201,7 @@ body.touch-device .mobile-controls {
     font-size: 1.2rem;
 }
 
-@media (min-width: 1440px) and (max-width: 1920px) and (pointer: fine) {
+@media (min-width: 1440px) and (max-width: 1920px) {
     .mobile-controls {
         display: none;
     }
@@ -212,21 +214,70 @@ body.touch-device .mobile-controls {
         height: 100%;
         max-width: 720px;
     }
+
+    .back-to-start-btn {
+        position: fixed;
+        top: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 20;
+        height: calc(30px + 20px);
+        width: calc(250px + 50px);
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 21px;
+        font-weight: 500;
+        color: rgba(255, 253, 253, 0.822);
+        background: rgba(122, 122, 122, 0.6);
+        cursor: pointer;
+        display: none;
+    }
+
+    .back-to-start-btn:hover {
+        background: rgba(187, 186, 185, 0.92);
+    }
+
+    .nochmal-btn {
+        display: none;
+        position: fixed;
+        height: calc(30px + 20px);
+        width: calc(150px + 50px);
+        border-radius: 8px;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        border: none;
+        padding: 8px 12px;
+        font-size: 21px;
+        font-weight: 500;
+        color: rgba(255, 253, 253, 0.822);
+        background: rgba(122, 122, 122, 0.6);
+        cursor: pointer;
+        z-index: 20;
+    }
+
+    .nochmal-btn:hover {
+        background: rgba(187, 186, 185, 0.92);
+    }
 }
 
-@media only screen and (max-width: 1440px) and (pointer: coarse) {
+@media only screen and (max-width: 1440px) {
     canvas {
         height: 100vh;
         width: 100vw;
     }
 
-    body.legal-page {
-        padding: 16px;
+    .legal-page {
+        width: min(760px, 90%);
+        padding: 20px;
     }
 
     .legal-card {
         padding: 20px;
         border-radius: 18px;
+        margin: 0;
+        padding: 20px;
     }
 
     .game-container h1 {
@@ -245,24 +296,65 @@ body.touch-device .mobile-controls {
     .mobile-controls {
         display: flex;
         position: absolute;
-        bottom: 25px;
+        bottom: 8px;
         max-width: 99vw;
     }
+
+    .back-to-start-btn {
+        position: fixed;
+        top: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 20;
+        height: calc(30px + 20px);
+        width: 100%;
+        max-width: calc(150px + 50px);
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 21px;
+        font-weight: 500;
+        color: rgba(255, 253, 253, 0.822);
+        background: rgba(122, 122, 122, 0.6);
+        cursor: pointer;
+        display: none;
+    }
+
+    .nochmal-btn {
+        display: none;
+        position: fixed;
+        height: calc(30px + 20px);
+        width: 100%;
+        max-width: calc(150px + 50px);
+        border-radius: 8px;
+        top: calc(5% + 50px);
+        right: calc(50% - 100px);
+        border: none;
+        padding: 8px 12px;
+        font-size: 21px;
+        font-weight: 500;
+        color: rgba(255, 253, 253, 0.822);
+        background: rgba(122, 122, 122, 0.6);
+        cursor: pointer;
+        z-index: 20;
+    }
 }
 
-@media only screen and (max-width: 768px) and (pointer: coarse) {
+@media only screen and (max-width: 768px) {
     canvas {
-        height: 100vh;
+        height: 95vh;
         width: 100vw;
     }
 
-    body.legal-page {
-        padding: 16px;
+    .legal-page {
+        width: min(760px, 90%);
+        padding: 20px;
     }
 
     .legal-card {
         padding: 20px;
         border-radius: 18px;
+        margin: 0;
     }
 
     .game-container h1 {
@@ -281,24 +373,54 @@ body.touch-device .mobile-controls {
     .mobile-controls {
         display: flex;
         position: absolute;
-        bottom: 25px;
+        bottom: 8px;
         max-width: 99vw;
     }
+
+    .nochmal-btn {
+        display: none;
+        position: fixed;
+        height: calc(20px + 20px);
+        width: calc(150px + 50px);
+        border-radius: 8px;
+        top: calc(70% + 55px);
+        right: calc(50% - 100px);
+        border: none;
+        padding: 8px 12px;
+        font-size: 21px;
+        font-weight: 500;
+        color: rgba(255, 253, 253, 0.822);
+        background: rgba(122, 122, 122, 0.6);
+        cursor: pointer;
+        z-index: 20;
+    }
 }
 
-@media only screen and (max-width: 480px) and (pointer: coarse) {
+@media only screen and (max-width: 480px) {
     canvas {
         height: 100vh;
         width: 100vw;
     }
 
-    body.legal-page {
-        padding: 16px;
+    .legal-page {
+        width: min(760px, 90%);
+        padding: 0;
+        justify-content: center;
     }
 
     .legal-card {
         padding: 20px;
         border-radius: 18px;
+        margin: 0;
+    }
+
+    .legal-back-link {
+        display: inline-flex;
+        margin-bottom: 20px;
+        color: #8a2f12;
+        font-weight: 100;
+        font-size: 32px;
+        text-decoration: none;
     }
 
     .game-container h1 {
@@ -317,7 +439,7 @@ body.touch-device .mobile-controls {
     .mobile-controls {
         display: flex;
         position: absolute;
-        bottom: 25px;
+        bottom: 8px;
         max-width: 99vw;
     }
 }

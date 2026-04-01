@@ -31,10 +31,12 @@ function init() {
   showStartScreen();
   initMobileScreen();
   mobileScreen.checkOrientation();
+  positionOverlayButtons();
   initBackToStartButton();
   initNochmalButton();
   initEventListeners();
 }
+
 /**
  * Creates and wires up screen and sound manager instances.
  * @returns {void}
@@ -53,6 +55,7 @@ function initMobileScreen() {
   mobileScreen = new MobilScreen(kayboard, resetKeyboardState);
   mobileScreen.init();
 }
+
 /**
  * Initializes audio, loads mute state and registers unlock callback.
  * @returns {void}
@@ -64,6 +67,7 @@ function initSound() {
     if (!musicMuted) {playActiveSceneAudio();}
   });
 }
+
 /**
  * Registers canvas and window event listeners.
  * @returns {void}
@@ -73,7 +77,11 @@ function initEventListeners() {
   canvas.addEventListener("mousemove", handleCanvasMouseMove);
   canvas.addEventListener("mouseleave", handleCanvasMouseLeave);
   window.addEventListener("resize", handleResize);
+  window.addEventListener("fullscreenchange", positionOverlayButtons);
+  window.addEventListener("webkitfullscreenchange", positionOverlayButtons);
+  window.addEventListener("msfullscreenchange", positionOverlayButtons);
 }
+
 /**
  * Plays the matching audio for the currently visible game scene.
  * @returns {void}
@@ -83,6 +91,7 @@ function playActiveSceneAudio() {
 
   soundManager.playScene(scene);
 }
+
 /**
  * Wires the back-to-start button click handler.
  * @returns {void}
@@ -91,6 +100,7 @@ function initBackToStartButton() {
   if (!backToStartButton) {return;}
   backToStartButton.addEventListener("click", returnToStartScreen);
 }
+
 /**
  * Wires the nochmal button click handler.
  * @returns {void}
@@ -99,11 +109,14 @@ function initNochmalButton() {
   if (!nochmalButton) {return;}
   nochmalButton.addEventListener("click", quickRestartGame);
 }
+
 /**
  * Toggles visibility for the back-to-start button depending on game state.
  * @returns {void}
  */
 function updateBackToStartButtonVisibility() {
+  positionOverlayButtons();
+
   if (backToStartButton) {
     backToStartButton.style.display = gameStarted && !gameOver ? "block" : "none";
   }
@@ -111,6 +124,32 @@ function updateBackToStartButtonVisibility() {
     nochmalButton.style.display = gameOver ? "block" : "none";
   }
 }
+
+/**
+ * Positions overlay buttons relative to the canvas bounds.
+ * @returns {void}
+ */
+function positionOverlayButtons() {
+  if (!canvas) {
+    return;
+  }
+
+  const rect = canvas.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+
+  if (backToStartButton) {
+    backToStartButton.style.left = `${centerX}px`;
+    backToStartButton.style.top = `${Math.max(rect.top + 5, 10)}px`;
+    backToStartButton.style.transform = "translateX(-50%)";
+  }
+
+  if (nochmalButton) {
+    nochmalButton.style.left = `${centerX}px`;
+    nochmalButton.style.top = `${Math.max(rect.bottom - 5, 10)}px`;
+    nochmalButton.style.transform = "translate(-50%, -100%)";
+  }
+}
+
 /**
  * Stops the current world loop and clears the world reference.
  * @returns {void}
@@ -121,6 +160,7 @@ function stopWorldIfRunning() {
   world.gameOver = true;
   world = null;
 }
+
 /**
  * Resets all keyboard flags to their default unpressed state.
  * @returns {void}
@@ -133,6 +173,7 @@ function resetKeyboardState() {
   kayboard.SPACE = false;
   kayboard.D = false;
 }
+
 /**
  * Returns from an active run back to the start screen.
  * @returns {void}
@@ -147,6 +188,7 @@ function returnToStartScreen() {
   soundManager.stopTracks(["gameOver", "win", "noBottles"]);
   showStartScreen();
 }
+
 /**
  * Delegates canvas click handling to the screen manager.
  * @param {MouseEvent} event Browser click event.
@@ -164,6 +206,7 @@ function handleCanvasClick(event) {
     },
   );
 }
+
 /**
  * Delegates canvas hover handling to the screen manager.
  * @param {MouseEvent} event Browser mouse move event.
@@ -172,6 +215,7 @@ function handleCanvasClick(event) {
 function handleCanvasMouseMove(event) {
   screenManager.handleCanvasMouseMove(event, { gameStarted, gameOver });
 }
+
 /**
  * Restores default cursor when the pointer leaves the canvas.
  * @returns {void}
@@ -179,6 +223,7 @@ function handleCanvasMouseMove(event) {
 function handleCanvasMouseLeave() {
   screenManager.resetCanvasCursor();
 }
+
 /**
  * Updates responsive canvas UI state on window resize.
  * @returns {void}
@@ -186,7 +231,9 @@ function handleCanvasMouseLeave() {
 function handleResize() {
   screenManager.updateIconPositions();
   mobileScreen.checkOrientation();
+  positionOverlayButtons();
 }
+
 /**
  * Starts a new game world and updates UI/audio state.
  * @returns {void}
@@ -239,6 +286,7 @@ function refreshSpeakerIcon() {
 
   screenManager.refreshSpeakerIcon(musicMuted);
 }
+
 /**
  * Toggles mute state and refreshes currently active audio.
  * @returns {void}
@@ -255,6 +303,7 @@ function toggleMusic() {
   }
   refreshSpeakerIcon();
 }
+
 /**
  * Shows win result screen.
  * @returns {void}
@@ -272,6 +321,7 @@ function showWinScreen() {
   updateBackToStartButtonVisibility();
   screenManager.showResultScreen( "./assets/img/You won, you lost/You Win A.png",musicMuted,);
 }
+
 /**
  * Shows game-over result screen.
  * @returns {void}
@@ -289,6 +339,7 @@ function showGameOverScreen() {
   updateBackToStartButtonVisibility();
   screenManager.showResultScreen( "./assets/img/9_intro_outro_screens/game_over/game over.png", musicMuted,);
 }
+
 /**
  * Shows lose screen when no bottles are left and endboss survives.
  * @returns {void}

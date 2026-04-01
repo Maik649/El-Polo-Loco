@@ -95,10 +95,6 @@ class MobilScreen {
     }
 
     overlay.style.display = isTouchDevice && !isLandscape ? "flex" : "none";
-
-    if (isTouchDevice && isLandscape) {
-      this.requestFullscreen();
-    }
   }
 
   /**

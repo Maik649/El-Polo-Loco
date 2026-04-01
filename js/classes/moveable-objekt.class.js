@@ -30,9 +30,7 @@ class MovableObject extends DrawableObjekt {
    * @returns {void}
    */
   isWork() {
-    const canPlayWorkingSound =
-      this.workingAudio &&
-      (!this.world?.soundManager || !this.world.soundManager.isMuted());
+    const canPlayWorkingSound = this.workingAudio && (!this.world?.soundManager || !this.world.soundManager.isMuted());
 
     if (this.world.kayboard.LEFT && this.x > 100) {
       this.moveLeft();
@@ -72,7 +70,7 @@ class MovableObject extends DrawableObjekt {
    * @param {number} [jumpStrength=15] Initial vertical velocity.
    * @returns {void}
    */
-  jump(jumpStrength = 15) {
+  jump(jumpStrength = 16) {
     if (this.isAboveGound()) {
       return;
     }
@@ -136,7 +134,7 @@ class MovableObject extends DrawableObjekt {
           this.speedY = 0;
         }
       }
-    }, 1000 / 20);
+    }, 1000 / 25);
   };
 
   /**

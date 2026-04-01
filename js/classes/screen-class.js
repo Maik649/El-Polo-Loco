@@ -24,10 +24,14 @@ class GameScreen {
     this.ctx = ctx;
     this.updateIconPositions();
   }
-
+/**
+   * Update Icon Position
+   * @param {HTMLCanvasElement} canvas Game canvas.
+   * @param {CanvasRenderingContext2D} ctx Rendering context.
+   * @returns {void}
+   */
   updateIconPositions() {
-    if (!this.canvas) {return;}
-
+    if (!this.canvas) { return;}
     this.fullscreenIcon.x = this.canvas.width - this.fullscreenIcon.width - 20;
     this.fullscreenIcon.y = 35;
     this.speakerIcon.x = this.fullscreenIcon.x - this.speakerIcon.width - 10;
@@ -38,13 +42,13 @@ class GameScreen {
    * Handles click actions for menu and result screens.
    * @param {MouseEvent} event Browser click event.
    * @param {{gameStarted: boolean, gameOver: boolean}} state Current game state.
-    * @param {{startGame: Function, restartGame: Function, toggleMusic: Function, toggleFullscreen: Function}} callbacks Action callbacks.
+   * @param {{startGame: Function, restartGame: Function, toggleMusic: Function, toggleFullscreen: Function}} callbacks Action callbacks.
    * @returns {void}
    */
   handleCanvasClick(event, state, callbacks) {
     const clickPosition = this.getCanvasClickPosition(event);
 
-    if (!state.gameStarted &&!state.gameOver && this.isInsideRect(clickPosition, this.impressumButton)) {
+    if (!state.gameStarted && !state.gameOver && this.isInsideRect(clickPosition, this.impressumButton)) {
       window.location.href = "./impressum.html";
       return;
     }
@@ -54,7 +58,7 @@ class GameScreen {
       return;
     }
 
-    if ( !state.gameStarted && !state.gameOver && this.isInsideRect(clickPosition, this.fullscreenIcon)) {
+    if (!state.gameStarted && !state.gameOver && this.isInsideRect(clickPosition, this.fullscreenIcon)) {
       callbacks.toggleFullscreen();
       return;
     }
@@ -64,7 +68,7 @@ class GameScreen {
       return;
     }
 
-    if (state.gameOver &&this.isInsideRect(clickPosition, this.restartButton)) {
+    if (state.gameOver && this.isInsideRect(clickPosition, this.restartButton)) {
       callbacks.restartGame();
     }
   }
@@ -77,20 +81,16 @@ class GameScreen {
    */
   handleCanvasMouseMove(event, state) {
     const mousePosition = this.getCanvasClickPosition(event);
-    const isHoveringButton = this.isHoveringInteractiveElement(
-      mousePosition,
-      state,
-    );
+    const isHoveringButton = this.isHoveringInteractiveElement( mousePosition, state,);
     this.canvas.style.cursor = isHoveringButton ? "pointer" : "default";
   }
 
   resetCanvasCursor() {
-    if (!this.canvas) {
-      return;
-    }
+    if (!this.canvas) { return;}
 
     this.canvas.style.cursor = "default";
   }
+
   /**
    * button cursor based on hover state over interactive elements.
    * @param {{gameStarted: boolean, gameOver: boolean}} state Current game state.
@@ -100,28 +100,18 @@ class GameScreen {
     const isStartScreen = !state.gameStarted && !state.gameOver;
     const isResultScreen = state.gameOver;
 
-    if (isStartScreen && this.isInsideRect(position, this.impressumButton)) {
-      return true;
-    }
+    if (isStartScreen && this.isInsideRect(position, this.impressumButton)) { return true;}
 
-    if (isStartScreen && this.isInsideRect(position, this.startButton)) {
-      return true;
-    }
+    if (isStartScreen && this.isInsideRect(position, this.startButton)) { return true;}
 
-    if (isResultScreen && this.isInsideRect(position, this.restartButton)) {
-      return true;
-    }
+    if (isResultScreen && this.isInsideRect(position, this.restartButton)) { return true;}
 
     if (
       (isStartScreen || isResultScreen) &&
       this.isInsideRect(position, this.speakerIcon)
-    ) {
-      return true;
-    }
+    ) {return true; }
 
-    if (isStartScreen && this.isInsideRect(position, this.fullscreenIcon)) {
-      return true;
-    }
+    if (isStartScreen && this.isInsideRect(position, this.fullscreenIcon)) { return true;}
 
     return false;
   }
@@ -136,22 +126,15 @@ class GameScreen {
     const scaleX = this.canvas.width / rect.width;
     const scaleY = this.canvas.height / rect.height;
 
-    return {
-      x: (event.clientX - rect.left) * scaleX,
-      y: (event.clientY - rect.top) * scaleY,
-    };
+    return {x: (event.clientX - rect.left) * scaleX, y: (event.clientY - rect.top) * scaleY,};
   }
+
   /**
    * Canvas rec
    * @returns
    */
   isInsideRect(position, rect) {
-    return (
-      position.x >= rect.x &&
-      position.x <= rect.x + rect.width &&
-      position.y >= rect.y &&
-      position.y <= rect.y + rect.height
-    );
+    return ( position.x >= rect.x &&  position.x <= rect.x + rect.width &&position.y >= rect.y && position.y <= rect.y + rect.height);
   }
 
   /**
@@ -161,14 +144,12 @@ class GameScreen {
    * @returns {void}
    */
   showStartScreen(musicMuted, onLoaded) {
-    this.renderImageScreen( "./assets/img/9_intro_outro_screens/start/startscreen_1.png", () => {
+    this.renderImageScreen( "./assets/img/9_intro_outro_screens/start/startscreen_1.png",  () => {
         this.drawImpressumButton();
         this.drawStartButton();
         this.drawFullscreenIcon();
         this.drawSpeakerIcon(musicMuted);
-        if (typeof onLoaded === "function") {
-          onLoaded();
-        }
+        if (typeof onLoaded === "function") { onLoaded();}
       },
     );
   }
@@ -185,11 +166,10 @@ class GameScreen {
       this.drawRestartButton();
       this.drawSpeakerIcon(musicMuted);
 
-      if (typeof onLoaded === "function") {
-        onLoaded();
-      }
+      if (typeof onLoaded === "function") { onLoaded(); }
     });
   }
+
   /**
    * Renders imgs
    * @param {Function}
@@ -203,73 +183,52 @@ class GameScreen {
       afterDraw();
     };
   }
+
   /**
    * Render Button Start
    */
   drawStartButton() {
     this.ctx.fillStyle = "rgba(122, 122, 122, 0.6)";
-    this.drawRoundedRect(
-      this.startButton.x,
-      this.startButton.y,
-      this.startButton.width,
-      this.startButton.height,
-      8,
-    );
-
+    this.drawRoundedRect(this.startButton.x,this.startButton.y, this.startButton.width,this.startButton.height,8,);
     this.ctx.fillStyle = "#ffffef";
     this.ctx.font = "18px Arial";
     this.ctx.textAlign = "center";
     this.ctx.textBaseline = "middle";
-    this.ctx.fillText(
-      "START",
-      this.startButton.x + this.startButton.width / 2,
-      this.startButton.y + this.startButton.height / 2,
-    );
+    this.ctx.fillText("START", this.startButton.x + this.startButton.width / 2, this.startButton.y + this.startButton.height / 2,);
   }
+
   /**
    * Render Button Impressum
    */
   drawImpressumButton() {
     this.ctx.fillStyle = "rgba(122, 122, 122, 0.6)";
-    this.drawRoundedRect(
-      this.impressumButton.x,
-      this.impressumButton.y,
-      this.impressumButton.width,
-      this.impressumButton.height,
-      8,
-    );
-
+    this.drawRoundedRect(this.impressumButton.x, this.impressumButton.y, this.impressumButton.width,this.impressumButton.height,8);
     this.ctx.fillStyle = "#fff7ef";
     this.ctx.font = "18px Arial";
     this.ctx.textAlign = "center";
     this.ctx.textBaseline = "middle";
-    this.ctx.fillText("Impressum",
-      this.impressumButton.x + this.impressumButton.width / 2,
-      this.impressumButton.y + this.impressumButton.height / 2,
-    );
+    this.ctx.fillText("Impressum", this.impressumButton.x + this.impressumButton.width / 2,this.impressumButton.y + this.impressumButton.height / 2,);
   }
+
   /**
    * Render Button Restart
    */
   drawRestartButton() {
     this.ctx.fillStyle = "rgba(122, 122, 122, 0.6)";
-    this.drawRoundedRect( this.restartButton.x, this.restartButton.y, this.restartButton.width, this.restartButton.height,8,);
+    this.drawRoundedRect( this.restartButton.x, this.restartButton.y,this.restartButton.width, this.restartButton.height,8,);
     this.ctx.fillStyle = "#ffffff";
     this.ctx.font = "18px Arial";
     this.ctx.textAlign = "center";
     this.ctx.textBaseline = "middle";
-    this.ctx.fillText("Zurück zum Start",
-      this.restartButton.x + this.restartButton.width / 2,
-      this.restartButton.y + this.restartButton.height / 2,
-    );
+    this.ctx.fillText("Back to Start",this.restartButton.x + this.restartButton.width / 2,this.restartButton.y + this.restartButton.height / 2,);
   }
+
   /**
    * Render Button Speaker
    */
   drawSpeakerIcon(musicMuted) {
     const { x, y, width, height } = this.speakerIcon;
     const centerY = y + height / 2;
-
     this.ctx.save();
     this.ctx.fillStyle = "#E0F2F7";
     this.drawRoundedRect(x, y, width, height, 6);
@@ -277,6 +236,7 @@ class GameScreen {
     this.drawSpeakerState(x, y, width, height, centerY, musicMuted);
     this.ctx.restore();
   }
+
   /**
    * Render Button Speaker
    */
@@ -286,7 +246,7 @@ class GameScreen {
     const speakerBodyH = 12;
 
     this.ctx.fillStyle = "#7c7b7b";
-    this.ctx.fillRect( speakerLeft,centerY - speakerBodyH / 2,speakerBodyW,speakerBodyH,);
+    this.ctx.fillRect( speakerLeft,centerY - speakerBodyH / 2,speakerBodyW, speakerBodyH,);
     this.ctx.beginPath();
     this.ctx.moveTo(speakerLeft + speakerBodyW, centerY - 6);
     this.ctx.lineTo(speakerLeft + speakerBodyW + 8, centerY - 10);
@@ -295,6 +255,7 @@ class GameScreen {
     this.ctx.closePath();
     this.ctx.fill();
   }
+
   /**
    * Render Button Speaker
    */
@@ -303,9 +264,9 @@ class GameScreen {
       this.drawMutedSlash(x, y, width, height);
       return;
     }
-
     this.drawSoundWaves(x, width, centerY);
   }
+
   /**
    * Render Button Speaker
    */
@@ -317,6 +278,7 @@ class GameScreen {
     this.ctx.lineTo(x + width - 9, y + 9);
     this.ctx.stroke();
   }
+
   /**
    * Render Button Speaker
    */
@@ -330,49 +292,55 @@ class GameScreen {
     this.ctx.arc(x + width - 10, centerY, 7, -0.7, 0.7);
     this.ctx.stroke();
   }
+
   /**
    * Render Button Speaker
    */
   refreshSpeakerIcon(musicMuted) {
-    if (!this.ctx) { return;}
+    if (!this.ctx) {  return; }
     this.drawSpeakerIcon(musicMuted);
   }
+
   /**
-   * Render Button Fullscreen
+   * Renders the fullscreen toggle icon on the start screen.
+   * @returns {void}
    */
   drawFullscreenIcon() {
-    if (this.fullscreenImage) {
-      this.renderFullscreenIconImage();
-      return;
-    }
+    const { x, y, width, height } = this.fullscreenIcon;
+    const inset = 10;
+    const arm = 7;
 
-    this.loadFullscreenIconImage();
-  }
+    this.ctx.save(); this.drawFullscreenIconBackground();
+    this.ctx.strokeStyle = "#7c7b7b";
+    this.ctx.lineWidth = 2; this.ctx.beginPath();
+    this.ctx.moveTo(x + inset + arm, y + inset);
+    this.ctx.lineTo(x + inset, y + inset);
+    this.ctx.lineTo(x + inset, y + inset + arm);
+    this.ctx.moveTo(x + width - inset - arm, y + inset);
+    this.ctx.lineTo(x + width - inset, y + inset);
+    this.ctx.lineTo(x + width - inset, y + inset + arm);
+    this.ctx.moveTo(x + inset + arm, y + height - inset);
+    this.ctx.lineTo(x + inset, y + height - inset);
+    this.ctx.lineTo(x + inset, y + height - inset - arm);
+    this.ctx.moveTo(x + width - inset - arm, y + height - inset);
+    this.ctx.lineTo(x + width - inset, y + height - inset);
+    this.ctx.lineTo(x + width - inset, y + height - inset - arm);
+    this.ctx.stroke();  this.ctx.restore();
+  } 
+
   /**
-   * Render Button Speaker
-   */
-  loadFullscreenIconImage() {
-    this.fullscreenImage = new Image();
-    this.fullscreenImage.src = "./assets/img/9_intro_outro_screens/start/full-screen-icon-11806.png";
-    this.fullscreenImage.onload = () => this.renderFullscreenIconImage();
-  }
-  /**
-   * Render Button Fullscreen
-   */
-  renderFullscreenIconImage() {
-    this.drawFullscreenIconBackground();
-    this.ctx.drawImage( this.fullscreenImage, this.fullscreenIcon.x, this.fullscreenIcon.y,this.fullscreenIcon.width,this.fullscreenIcon.height,);
-  }
-  /**
-   * Render Button Fullscreen
+   * FullScreeen 
    */
   drawFullscreenIconBackground() {
-    const { x, y, width, height } = this.fullscreenIcon; const radius = 6;
-    this.ctx.fillStyle = "#E0F2F7"; this.ctx.beginPath();
-    this.ctx.moveTo(x + radius, y); this.ctx.lineTo(x + width - radius, y);
+    const { x, y, width, height } = this.fullscreenIcon;
+    const radius = 6;
+    this.ctx.fillStyle = "#E0F2F7";
+    this.ctx.beginPath();
+    this.ctx.moveTo(x + radius, y);
+    this.ctx.lineTo(x + width - radius, y);
     this.ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
     this.ctx.lineTo(x + width, y + height - radius);
-    this.ctx.quadraticCurveTo(x + width,y + height,x + width - radius,y + height,);
+    this.ctx.quadraticCurveTo( x + width,y + height,x + width - radius,y + height,);
     this.ctx.lineTo(x + radius, y + height);
     this.ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
     this.ctx.lineTo(x, y + radius);
@@ -380,6 +348,7 @@ class GameScreen {
     this.ctx.closePath();
     this.ctx.fill();
   }
+
   /**
    * Render Button border-radius
    */
@@ -389,7 +358,7 @@ class GameScreen {
     this.ctx.lineTo(x + width - radius, y);
     this.ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
     this.ctx.lineTo(x + width, y + height - radius);
-    this.ctx.quadraticCurveTo(x + width, y + height, x + width - radius,y + height,);
+    this.ctx.quadraticCurveTo( x + width,y + height, x + width - radius,y + height,);
     this.ctx.lineTo(x + radius, y + height);
     this.ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
     this.ctx.lineTo(x, y + radius);

@@ -71,6 +71,7 @@ class StatusBar extends DrawableObjekt {
     this.height = 50;
     this.setPercentage(100);
   }
+  
   /**
    * init Endboss Bar.
    */
@@ -83,6 +84,7 @@ class StatusBar extends DrawableObjekt {
     this.height = 50;
     this.setPercentage(100);
   }
+
   /**
    * initBottle Bar.
    */
@@ -95,6 +97,7 @@ class StatusBar extends DrawableObjekt {
     this.height = 50;
     this.setPercentageBottel(0);
   }
+
   /**
    * init Coins Bar
    */
@@ -129,6 +132,7 @@ class StatusBar extends DrawableObjekt {
     let path = this.imageSet[this.resolveImageIndex_1()];
     this.img = this.imageCache[path];
   }
+
   /**
    * resolve Image Index
    */
@@ -147,6 +151,7 @@ class StatusBar extends DrawableObjekt {
       return 0;
     }
   }
+
   /**
    * resolve Image Index 1
    */

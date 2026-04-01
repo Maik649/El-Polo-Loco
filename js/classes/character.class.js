@@ -71,6 +71,8 @@ class Character extends MovableObject{
     "./assets/img/2_character_pepe/4_hurt/H-43.png",
   ];
   currentClock = 0;
+  jumpFrameIndex = 0;
+  isJumpAnimationActive = false;
   world;
   speed = 10;
 
@@ -111,6 +113,7 @@ class Character extends MovableObject{
     this.kayboardCheckvorAnimation();
     this.setAnimationenCheck();
   }
+
   /**
    * Checks if the Input can play.
    * @returns {boolean}
@@ -124,14 +127,17 @@ class Character extends MovableObject{
       } else if (this.isHurt()) {
         this.playAnimation(this.HURTIMAGE);
       } else if (this.isAboveGound()) {
-        this.playAnimation(this.JUMPIMAGE);
+        this.playJumpAnimation();
       } else {
+        this.jumpFrameIndex = 0;
+        this.isJumpAnimationActive = false;
         if (this.world.kayboard.LEFT || this.world.kayboard.RIGHT) {
           this.playAnimation(this.WORKIMAGE);
         }
       }
-    }, 80);
+    }, 60);
   }
+
   /**
    * Checks if the Input can play.
    * @returns {boolean}
@@ -181,5 +187,24 @@ class Character extends MovableObject{
    */
   isInIdleMode() {
     return this.canBeIdle() && this.currentClock < 30;
+  }
+
+  /**
+   * Plays jump animation once per jump with dedicated frame tracking.
+   * @returns {void}
+   */
+  playJumpAnimation() {
+    if (!this.isJumpAnimationActive) {
+      this.isJumpAnimationActive = true;
+      this.jumpFrameIndex = 0;
+    }
+
+    const frameIndex = Math.min(this.jumpFrameIndex, this.JUMPIMAGE.length - 1);
+    const framePath = this.JUMPIMAGE[frameIndex];
+    this.img = this.imageCache[framePath];
+
+    if (this.jumpFrameIndex < this.JUMPIMAGE.length - 1) {
+      this.jumpFrameIndex++;
+    }
   }
 }
