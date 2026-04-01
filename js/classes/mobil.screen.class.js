@@ -47,11 +47,21 @@ class MobilScreen {
    */
   bindControlButton(buttonId, key) {
     const button = document.getElementById(buttonId);
-
     if (!button) {
       return;
     }
+    const { start, end, prevent } = this.createButtonHandlers(key);
+    const bindEvents = window.PointerEvent ? this.bindPointerEvents : this.bindFallbackEvents;
+    bindEvents.call(this, button, start, end);
+    this.bindSuppressEvents(button, prevent);
+  }
 
+  /**
+   * Creates start/end/prevent handlers for one control key.
+   * @param {"LEFT"|"RIGHT"|"SPACE"|"D"} key Keyboard flag to toggle.
+   * @returns {{start: Function, end: Function, prevent: Function}}
+   */
+  createButtonHandlers(key) {
     const start = (event) => {
       event.preventDefault();
       this.kayboard[key] = true;
@@ -62,27 +72,50 @@ class MobilScreen {
       this.kayboard[key] = false;
     };
 
-    const preventBrowserMenu = (event) => {
-      event.preventDefault();
-    };
+    const prevent = (event) => event.preventDefault();
+    return { start, end, prevent };
+  }
 
-    if (window.PointerEvent) {
-      button.addEventListener("pointerdown", start);
-      button.addEventListener("pointerup", end);
-      button.addEventListener("pointercancel", end);
-      button.addEventListener("pointerleave", end);
-    } else {
-      button.addEventListener("touchstart", start, { passive: false });
-      button.addEventListener("touchend", end, { passive: false });
-      button.addEventListener("touchcancel", end, { passive: false });
-      button.addEventListener("mousedown", start);
-      button.addEventListener("mouseup", end);
-      button.addEventListener("mouseleave", end);
-    }
+  /**
+   * Binds pointer events for modern touch and pen devices.
+   * @param {HTMLElement} button Target control button.
+   * @param {(event: Event) => void} start Press handler.
+   * @param {(event: Event) => void} end Release handler.
+   * @returns {void}
+   */
+  bindPointerEvents(button, start, end) {
+    button.addEventListener("pointerdown", start);
+    button.addEventListener("pointerup", end);
+    button.addEventListener("pointercancel", end);
+    button.addEventListener("pointerleave", end);
+  }
 
-    button.addEventListener("contextmenu", preventBrowserMenu);
-    button.addEventListener("selectstart", preventBrowserMenu);
-    button.addEventListener("dragstart", preventBrowserMenu);
+  /**
+   * Binds fallback touch/mouse events for older browsers.
+   * @param {HTMLElement} button Target control button.
+   * @param {(event: Event) => void} start Press handler.
+   * @param {(event: Event) => void} end Release handler.
+   * @returns {void}
+   */
+  bindFallbackEvents(button, start, end) {
+    button.addEventListener("touchstart", start, { passive: false });
+    button.addEventListener("touchend", end, { passive: false });
+    button.addEventListener("touchcancel", end, { passive: false });
+    button.addEventListener("mousedown", start);
+    button.addEventListener("mouseup", end);
+    button.addEventListener("mouseleave", end);
+  }
+
+  /**
+   * Prevents browser UI interactions on long press.
+   * @param {HTMLElement} button Target control button.
+   * @param {(event: Event) => void} prevent Prevention handler.
+   * @returns {void}
+   */
+  bindSuppressEvents(button, prevent) {
+    button.addEventListener("contextmenu", prevent);
+    button.addEventListener("selectstart", prevent);
+    button.addEventListener("dragstart", prevent);
   }
 
   /**
