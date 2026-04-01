@@ -117,6 +117,7 @@ body.touch-device .mobile-controls { display: flex;}
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
+    -webkit-user-drag: none;
 }
 
 .mobile-btn img {
@@ -129,6 +130,11 @@ body.touch-device .mobile-controls { display: flex;}
     justify-content: center;
     align-items: center;
     transform: rotate(45deg);
+    pointer-events: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
 }
 
 #orientationOverlay {

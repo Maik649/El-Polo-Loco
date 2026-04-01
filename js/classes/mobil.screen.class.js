@@ -62,6 +62,10 @@ class MobilScreen {
       this.kayboard[key] = false;
     };
 
+    const preventBrowserMenu = (event) => {
+      event.preventDefault();
+    };
+
     if (window.PointerEvent) {
       button.addEventListener("pointerdown", start);
       button.addEventListener("pointerup", end);
@@ -76,9 +80,9 @@ class MobilScreen {
       button.addEventListener("mouseleave", end);
     }
 
-    button.addEventListener("contextmenu", (event) => {
-      event.preventDefault();
-    });
+    button.addEventListener("contextmenu", preventBrowserMenu);
+    button.addEventListener("selectstart", preventBrowserMenu);
+    button.addEventListener("dragstart", preventBrowserMenu);
   }
 
   /**
