@@ -11,7 +11,6 @@ body {
     background-size: cover;
 }
 
-
 h1 {
     margin: 0;
 }
@@ -97,9 +96,7 @@ canvas {
     background: rgba(187, 186, 185, 0.92);
 }
 
-body.touch-device .mobile-controls {
-    display: flex;
-}
+body.touch-device .mobile-controls { display: flex;}
 
 .mobile-controls-group {
     display: flex;
@@ -153,9 +150,7 @@ body.touch-device .mobile-controls {
 }
 
 @media (min-width: 1440px) and (max-width: 1920px) {
-    .mobile-controls {
-        display: none;
-    }
+    .mobile-controls {  display: none;}
 
     .game-container {
         display: flex;
@@ -185,9 +180,7 @@ body.touch-device .mobile-controls {
         display: none;
     }
 
-    .back-to-start-btn:hover {
-        background: rgba(187, 186, 185, 0.92);
-    }
+    .back-to-start-btn:hover { background: rgba(187, 186, 185, 0.92);}
 
     .nochmal-btn {
         display: none;
@@ -208,9 +201,7 @@ body.touch-device .mobile-controls {
         z-index: 20;
     }
 
-    .nochmal-btn:hover {
-        background: rgba(187, 186, 185, 0.92);
-    }
+    .nochmal-btn:hover {background: rgba(187, 186, 185, 0.92);}
 }
 
 @media only screen and (max-width: 1440px) {
@@ -308,9 +299,7 @@ body.touch-device .mobile-controls {
         margin: 0;
     }
 
-    .game-container h1 {
-        display: none;
-    }
+    .game-container h1 {display: none;}
 
     .game-container {
         display: flex;
@@ -401,10 +390,7 @@ body.touch-device .mobile-controls {
     height: 100vh;
 }
 
-
-.game-container:fullscreen h1 {
-    display: none;
-}
+.game-container:fullscreen h1 { display: none;}
 
 .game-container:fullscreen canvas,
 .game-container:-webkit-full-screen canvas {
