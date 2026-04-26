@@ -34,16 +34,6 @@ Ein spannendes 2D-Spiel mit dynamischen Spielmechaniken und ansprechender Grafik
    cd El-Polo-Loco
    ```
 
-2. **Abhängigkeiten installieren:**
-   ```bash
-   npm install
-   ```
-
-3. **Spiel starten:**
-   ```bash
-   npm start
-   ```
-
 Das Spiel sollte sich dann in deinem Standard-Browser öffnen.
 
 ## 🎮 Verwendung
@@ -55,29 +45,18 @@ Nach dem Start des Spiels kannst du direkt mit dem Spielen beginnen. Das Spiel b
 | Taste | Aktion |
 |-------|--------|
 | **Pfeiltasten** ↑ ↓ ← → | Spieler bewegen |
-| **Leertaste** | Sprung / Aktion |
-| **ESC** | Pause |
-| **P** | Menü |
-
-*(Bitte passe diese Steuerung an dein tatsächliches Spiel an)*
+| **D** | Sprung / Aktion |
 
 ## 📁 Projekt-Struktur
 
 ```
 El-Polo-Loco/
-├── src/
-│   ├── index.js
-│   ├── game.js
-│   ├── player.js
-│   └── ...
 ├── assets/
 │   ├── images/
 │   ├── sounds/
 │   └── ...
-├── styles/
 │   └── style.css
 ├── index.html
-├── package.json
 └── README.md
 ```
 
@@ -85,18 +64,8 @@ El-Polo-Loco/
 
 - **Browser**: Chrome, Firefox, Safari, Edge (aktuelle Versionen)
 - **Auflösung**: Mindestens 800x600 Pixel
-- **RAM**: Min. 512MB
 
 ## 🔧 Entwicklung
-
-Zum Beitragen zum Projekt:
-
-1. **Fork** das Repository
-2. Erstelle einen **Feature-Branch**: `git checkout -b feature/deine-funktion`
-3. **Commit** deine Änderungen: `git commit -m 'Neue Feature hinzugefügt'`
-4. **Push** zum Branch: `git push origin feature/deine-funktion`
-5. Erstelle einen **Pull Request**
-
 ## 📝 Lizenz
 
 Dieses Projekt ist unter der [MIT-Lizenz](LICENSE) lizenziert.
